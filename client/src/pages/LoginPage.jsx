@@ -21,10 +21,8 @@ export function LoginPage() {
 
 	// Redirect if already authenticated
 	useEffect(() => {
-		console.log('LoginPage useEffect - auth state:', { isAuthenticated, user: user?.role })
 		if (isAuthenticated && user) {
 			const returnTo = location.state?.from?.pathname || getDashboardPath(user.role)
-			console.log('Redirecting from LoginPage to:', returnTo)
 			navigate(returnTo, { replace: true })
 		}
 	}, [isAuthenticated, user, navigate, location])
@@ -79,7 +77,7 @@ export function LoginPage() {
 			}
 			// Login successful - redirection will be handled by useEffect
 		} catch (error) {
-			setErrors({ submit: error.message || 'Login failed' })
+			setErrors({ submit: error.response?.data?.message || 'Login failed' })
 		}
 	}
 

@@ -61,6 +61,7 @@ app.get('/api/debug/set-cookie', (req, res) => {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',
 		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+		domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
 		maxAge: 60 * 1000 // 1 minute
 	})
 	res.json({ 

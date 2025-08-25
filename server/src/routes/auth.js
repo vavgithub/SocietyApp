@@ -117,6 +117,7 @@ router.post('/register-admin', [
 		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',
 		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+		domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
 		maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 	})
 
@@ -184,6 +185,7 @@ router.post('/login', [
 		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',
 		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+		domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
 		maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 	})
 
@@ -208,7 +210,8 @@ router.post('/logout', asyncHandler(async (req, res) => {
 	res.clearCookie('token', {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',
-		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+		domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
 	})
 	res.json({ message: 'Logout successful' })
 }))
