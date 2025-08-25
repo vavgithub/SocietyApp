@@ -23,7 +23,9 @@ const PORT = process.env.PORT || 4000
 // Middleware
 app.use(cors({
 	origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-	credentials: true
+	credentials: true,
+	methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+	allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -35,7 +37,39 @@ app.get('/api/health', (req, res) => {
 	res.json({ 
 		status: 'OK', 
 		message: 'SocietySync API is running',
-		timestamp: new Date().toISOString()
+		timestamp: new Date().toISOString(),
+		environment: process.env.NODE_ENV || 'development',
+		frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173'
+	})
+})
+
+// Debug endpoint to check cookies
+app.get('/api/debug/cookies', (req, res) => {
+	res.json({
+		cookies: req.cookies,
+		headers: {
+			cookie: req.headers.cookie,
+			origin: req.headers.origin,
+			referer: req.headers.referer
+		}
+	})
+})
+
+// Test endpoint to set a cookie
+app.get('/api/debug/set-cookie', (req, res) => {
+	res.cookie('test-cookie', 'test-value', {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === 'production',
+		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+		maxAge: 60 * 1000 // 1 minute
+	})
+	res.json({ 
+		message: 'Test cookie set',
+		environment: process.env.NODE_ENV || 'development',
+		cookieOptions: {
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+		}
 	})
 })
 

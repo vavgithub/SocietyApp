@@ -229,6 +229,21 @@ router.post('/accept', [
 	invitedUser.isRegistered = true
 	await apartment.save()
 
+	// Generate JWT token for automatic login
+	const authToken = jwt.sign(
+		{ userId: user._id, role: user.role, apartmentId: user.apartmentId },
+		process.env.JWT_SECRET,
+		{ expiresIn: '7d' }
+	)
+
+	// Set cookie
+	res.cookie('token', authToken, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === 'production',
+		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+		maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+	})
+
 	res.status(201).json({
 		message: 'User registered successfully',
 		user: {
