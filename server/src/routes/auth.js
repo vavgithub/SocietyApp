@@ -112,12 +112,11 @@ router.post('/register-admin', [
 		{ expiresIn: '7d' }
 	)
 
-	// Set cookie
+	// Set cookie with environment-specific settings
 	res.cookie('userToken', token, {
-		httpOnly: true,
+		httpOnly: false, // Allow frontend to read the cookie
 		secure: process.env.NODE_ENV === 'production',
 		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-		domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
 		maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 	})
 
@@ -180,12 +179,11 @@ router.post('/login', [
 		{ expiresIn: '7d' }
 	)
 
-	// Set cookie
+	// Set cookie with environment-specific settings
 	res.cookie('userToken', token, {
-		httpOnly: true,
+		httpOnly: false, // Allow frontend to read the cookie
 		secure: process.env.NODE_ENV === 'production',
 		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-		domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
 		maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
 	})
 
@@ -208,10 +206,9 @@ router.post('/login', [
 // Logout
 router.post('/logout', asyncHandler(async (req, res) => {
 	res.clearCookie('userToken', {
-		httpOnly: true,
+		httpOnly: false,
 		secure: process.env.NODE_ENV === 'production',
-		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-		domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
+		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
 	})
 	res.json({ message: 'Logout successful' })
 }))
