@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout'
 import { adminAPI } from '../lib/api'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { showSuccessToast, showErrorToast } from '../lib/toast'
 
 export function SocietySettings() {
 	const { user } = useAuth()
@@ -38,6 +39,11 @@ export function SocietySettings() {
 		onSuccess: () => {
 			queryClient.invalidateQueries(['apartment'])
 			setIsEditing(false)
+			showSuccessToast('Society settings updated successfully!')
+		},
+		onError: (error) => {
+			const errorMessage = error.response?.data?.message || 'Failed to update society settings'
+			showErrorToast(errorMessage)
 		}
 	})
 

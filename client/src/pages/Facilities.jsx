@@ -7,6 +7,7 @@ import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout'
+import { showSuccessToast, showErrorToast } from '../lib/toast'
 
 export function Facilities() {
 	const { user } = useAuth()
@@ -36,9 +37,12 @@ export function Facilities() {
 			queryClient.invalidateQueries(['facilities'])
 			setIsAddingFacility(false)
 			resetForm()
+			showSuccessToast('Facility added successfully!')
 		},
 		onError: (error) => {
-			setErrors({ submit: error.response?.data?.message || 'Failed to add facility' })
+			const errorMessage = error.response?.data?.message || 'Failed to add facility'
+			setErrors({ submit: errorMessage })
+			showErrorToast(errorMessage)
 		}
 	})
 
@@ -49,9 +53,12 @@ export function Facilities() {
 			queryClient.invalidateQueries(['facilities'])
 			setEditingFacility(null)
 			resetForm()
+			showSuccessToast('Facility updated successfully!')
 		},
 		onError: (error) => {
-			setErrors({ submit: error.response?.data?.message || 'Failed to update facility' })
+			const errorMessage = error.response?.data?.message || 'Failed to update facility'
+			setErrors({ submit: errorMessage })
+			showErrorToast(errorMessage)
 		}
 	})
 
@@ -60,9 +67,12 @@ export function Facilities() {
 		mutationFn: adminAPI.toggleFacilityStatus,
 		onSuccess: () => {
 			queryClient.invalidateQueries(['facilities'])
+			showSuccessToast('Facility status updated successfully!')
 		},
 		onError: (error) => {
+			const errorMessage = error.response?.data?.message || 'Failed to toggle facility status'
 			console.error('Failed to toggle facility status:', error)
+			showErrorToast(errorMessage)
 		}
 	})
 

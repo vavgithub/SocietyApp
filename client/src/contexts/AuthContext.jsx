@@ -84,7 +84,14 @@ export function AuthProvider({ children }) {
 	}
 	
 	const logout = () => logoutMutation.mutate()
-	const registerAdmin = (data) => registerAdminMutation.mutate(data)
+	const registerAdmin = async (data) => {
+		try {
+			const result = await registerAdminMutation.mutateAsync(data)
+			return result
+		} catch (error) {
+			throw error
+		}
+	}
 	
 	const updateUser = (newUserData) => {
 		setUser(newUserData)

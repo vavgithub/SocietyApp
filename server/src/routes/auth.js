@@ -48,7 +48,9 @@ router.post('/request-admin-otp', [
 router.post('/register-admin', [
 	body('name').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
 	body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
-	body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+	body('password')
+		.isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+		.matches(/^(?=.*[a-zA-Z])(?=.*\d)/).withMessage('Password must contain both letters and numbers'),
 	body('societyName').trim().isLength({ min: 2 }).withMessage('Society name must be at least 2 characters'),
 	body('societyAddress').trim().isLength({ min: 5 }).withMessage('Society address must be at least 5 characters'),
 	body('housingType').isIn(['villa', 'flat']).withMessage('Housing type must be either villa or flat'),

@@ -6,6 +6,7 @@ import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Navbar } from '../components/Navbar'
+import { showSuccessToast } from '../lib/toast'
 
 export function LoginPage() {
 	const [formData, setFormData] = useState({
@@ -73,6 +74,9 @@ export function LoginPage() {
 
 		try {
 			const result = await login(formData.email, formData.password)
+			if(result.user){
+				showSuccessToast("User Logged In successfully")
+			}
 			// Login successful - redirection will be handled by useEffect
 		} catch (error) {
 			setErrors({ submit: error.message || 'Login failed' })

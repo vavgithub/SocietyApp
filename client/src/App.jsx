@@ -25,7 +25,7 @@ import { BuildingIllustration } from './components/BuildingIllustration'
 import { FeatureCard } from './components/FeatureCard'
 import { Button } from './components/ui/button'
 import './index.css'
-import { AuthenticatedLayout } from './components/AuthenticatedLayout'
+import { Toaster } from 'react-hot-toast'
 
 // Create a client
 const queryClient = new QueryClient({
@@ -440,6 +440,17 @@ export default function App() {
 					<AppRoutes />
 					<PWAUpdatePrompt />
 					<PWAInstallPrompt />
+					<Toaster 
+						position="top-right"
+						toastOptions={{
+							duration: 3000,
+							style: {
+								borderRadius: '8px',
+								fontSize: '14px',
+								fontWeight: '500',
+							},
+						}}
+					/>
 				</BrowserRouter>
 			</AuthProvider>
 		</QueryClientProvider>

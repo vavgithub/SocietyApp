@@ -7,6 +7,7 @@ import { Label } from '../components/ui/label'
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout'
 import { visitorAPI, guardAPI } from '../lib/api'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { showSuccessToast, showErrorToast } from '../lib/toast'
 
 export function VisitorLog() {
 	const { user } = useAuth()
@@ -59,6 +60,11 @@ export function VisitorLog() {
 			})
 			setPhotoFile(null)
 			setIdCardFile(null)
+			showSuccessToast('Visitor added successfully!')
+		},
+		onError: (error) => {
+			const errorMessage = error.response?.data?.message || 'Failed to add visitor'
+			showErrorToast(errorMessage)
 		}
 	})
 
@@ -66,6 +72,11 @@ export function VisitorLog() {
 		mutationFn: ({ id, checkOutDateTime }) => visitorAPI.checkout(id, checkOutDateTime),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['visitors'] })
+			showSuccessToast('Visitor checked out successfully!')
+		},
+		onError: (error) => {
+			const errorMessage = error.response?.data?.message || 'Failed to checkout visitor'
+			showErrorToast(errorMessage)
 		}
 	})
 
@@ -73,12 +84,12 @@ export function VisitorLog() {
 		e.preventDefault()
 		
 		if (!photoFile) {
-			alert('Please select a visitor photo')
+			showErrorToast('Please select a visitor photo')
 			return
 		}
 
 		if (!idCardFile) {
-			alert('Please select an ID card photo')
+			showErrorToast('Please select an ID card photo')
 			return
 		}
 

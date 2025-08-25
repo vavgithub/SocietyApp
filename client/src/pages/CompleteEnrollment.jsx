@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminAPI } from '../lib/api'
@@ -7,12 +7,20 @@ import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { showSuccessToast, showErrorToast } from '../lib/toast'
 
 export function CompleteEnrollment() {
 	const { user } = useAuth()
 	const queryClient = useQueryClient()
-	
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if(user && user.apartmentId.isEnrollmentComplete) {
+			navigate('/admin')
+		}
+	}, [user])
+
 	const [formData, setFormData] = useState({
 		// Common fields
 		contactInfo: {
@@ -40,9 +48,13 @@ export function CompleteEnrollment() {
 		mutationFn: adminAPI.completeEnrollment,
 		onSuccess: () => {
 			queryClient.invalidateQueries(['apartment'])
+			showSuccessToast('Society enrollment completed successfully!')
+			navigate('/admin')
 		},
 		onError: (error) => {
-			setErrors({ submit: error.response?.data?.message || 'Failed to complete enrollment' })
+			const errorMessage = error.response?.data?.message || 'Failed to complete enrollment'
+			setErrors({ submit: errorMessage })
+			showErrorToast(errorMessage)
 		}
 	})
 

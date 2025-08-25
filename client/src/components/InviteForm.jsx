@@ -5,6 +5,7 @@ import { Label } from './ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { adminAPI, inviteAPI } from '../lib/api'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { showSuccessToast , showErrorToast } from '../lib/toast'
 
 export function InviteForm({ role = 'tenant' }) {
 	const queryClient = useQueryClient()
@@ -30,6 +31,9 @@ export function InviteForm({ role = 'tenant' }) {
 		mutationFn: inviteAPI.generateInvite,
 		onSuccess: (data) => {
 			setInviteLink(data.inviteLink)
+			// Automatically copy to clipboard
+			navigator.clipboard.writeText(data.inviteLink)
+			showSuccessToast('Invite URL copied to clipboard!')
 			setShowSuccess(true)
 			setFormData({
 				email: '',
@@ -38,6 +42,10 @@ export function InviteForm({ role = 'tenant' }) {
 				flatNumber: '',
 				flatName: ''
 			})
+		},
+		onError: (error) => {
+			console.log(error)
+			showErrorToast(error.response?.data?.message || 'Failed to generate invite')
 		}
 	})
 
@@ -67,6 +75,7 @@ export function InviteForm({ role = 'tenant' }) {
 
 	const copyToClipboard = () => {
 		navigator.clipboard.writeText(inviteLink)
+		showSuccessToast('Invite URL copied to clipboard!')
 	}
 
 	const getTitle = () => {
@@ -89,13 +98,14 @@ export function InviteForm({ role = 'tenant' }) {
 				<CardHeader>
 					<CardTitle className="text-[rgb(22,163,74)]">Invite Generated Successfully!</CardTitle>
 					<CardDescription>
-						Share this link with the invited user. The link will expire in 15 minutes.
+						The invite link has been generated and copied to your clipboard. Share it with the invited user. The link will expire in 15 minutes.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<div className="p-3 bg-[rgb(240,253,244)] border border-[rgb(187,247,208)] rounded-lg">
-						<p className="text-sm font-medium text-[rgb(22,101,52)] mb-2">Invite Link:</p>
-						<p className="text-sm text-[rgb(22,101,52)] break-all">{inviteLink}</p>
+						<p className="text-sm font-medium text-[rgb(22,101,52)]">
+							✅ Invite link ready to share
+						</p>
 					</div>
 					<div className="flex gap-2">
 						<Button
@@ -103,7 +113,7 @@ export function InviteForm({ role = 'tenant' }) {
 							variant="outline"
 							className="flex-1"
 						>
-							Copy Link
+							Copy Link Again
 						</Button>
 						<Button
 							onClick={() => setShowSuccess(false)}

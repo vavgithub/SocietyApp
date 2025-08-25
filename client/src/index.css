@@ -172,6 +172,28 @@ textarea {
 	user-select: none;
 }
 
+/* Add pointer cursor to all clickable elements */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+a,
+[role="button"],
+[onclick],
+[data-clickable="true"] {
+	cursor: pointer;
+}
+
+/* Ensure links have pointer cursor */
+a {
+	cursor: pointer;
+}
+
+/* Ensure buttons have pointer cursor */
+button {
+	cursor: pointer;
+}
+
 /* Allow text selection in content areas */
 p, 
 span, 

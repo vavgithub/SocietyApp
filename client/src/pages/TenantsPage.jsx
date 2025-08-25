@@ -6,6 +6,7 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout'
 import { InviteForm } from '../components/InviteForm'
+import { showSuccessToast, showErrorToast } from '../lib/toast'
 
 export function TenantsPage() {
 	const { user } = useAuth()
@@ -25,7 +26,12 @@ export function TenantsPage() {
 		mutationFn: ({ userId, isActive }) => adminAPI.updateUserStatus(userId, isActive),
 		onSuccess: () => {
 			queryClient.invalidateQueries(['tenants'])
+			showSuccessToast('Tenant status updated successfully!')
 		},
+		onError: (error) => {
+			const errorMessage = error.response?.data?.message || 'Failed to update tenant status'
+			showErrorToast(errorMessage)
+		}
 	})
 
 	const handleToggleUserStatus = async (userId, currentStatus) => {

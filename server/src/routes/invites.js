@@ -147,7 +147,9 @@ router.post('/accept', [
 	body('token').notEmpty().withMessage('Token is required'),
 	body('name').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
 	body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
-	body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+	body('password')
+		.isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+		.matches(/^(?=.*[a-zA-Z])(?=.*\d)/).withMessage('Password must contain both letters and numbers'),
 	body('confirmPassword').notEmpty().withMessage('Confirm password is required'),
 	body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
 ], asyncHandler(async (req, res) => {

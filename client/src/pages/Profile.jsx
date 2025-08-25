@@ -7,6 +7,7 @@ import { Label } from '../components/ui/label'
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { userAPI } from '../lib/api'
+import { showSuccessToast, showErrorToast } from '../lib/toast'
 
 export function Profile() {
 	const { user, updateUser } = useAuth()
@@ -32,10 +33,12 @@ export function Profile() {
 			// Invalidate user-related queries
 			queryClient.invalidateQueries({ queryKey: ['user'] })
 			setIsEditing(false)
+			showSuccessToast('Profile updated successfully!')
 		},
 		onError: (error) => {
 			console.error('Error updating profile:', error)
-			alert('Failed to update profile. Please try again.')
+			const errorMessage = error.response?.data?.message || 'Failed to update profile. Please try again.'
+			showErrorToast(errorMessage)
 		}
 	})
 

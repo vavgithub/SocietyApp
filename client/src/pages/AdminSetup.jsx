@@ -22,6 +22,7 @@ export function AdminSetup() {
 	})
 	const [errors, setErrors] = useState({})
 	const [isRequestingOTP, setIsRequestingOTP] = useState(false)
+	const [isResendingOTP, setIsResendingOTP] = useState(false)
 	
 	const { registerAdmin, isRegistering } = useAuth()
 	const [registrationSuccess, setRegistrationSuccess] = useState(false)
@@ -46,6 +47,24 @@ export function AdminSetup() {
 		}
 	}
 
+	const handleResendOTP = async () => {
+		if (!formData.email) {
+			setErrors({ submit: 'Unable to resend OTP. Please go back and try again.' })
+			return
+		}
+
+		try {
+			setIsResendingOTP(true)
+			setErrors({})
+			await authAPI.requestAdminOTP(formData.email)
+			setErrors({ otp: '' }) // Clear any OTP errors
+		} catch (error) {
+			setErrors({ submit: error.response?.data?.message || 'Failed to resend OTP' })
+		} finally {
+			setIsResendingOTP(false)
+		}
+	}
+
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 		
@@ -56,6 +75,8 @@ export function AdminSetup() {
 			if (!formData.email) newErrors.email = 'Email is required'
 			if (!formData.password) newErrors.password = 'Password is required'
 			if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters'
+			if (!/(?=.*[a-zA-Z])/.test(formData.password)) newErrors.password = 'Password must contain at least one letter'
+			if (!/(?=.*\d)/.test(formData.password)) newErrors.password = 'Password must contain at least one number'
 			if (formData.password !== formData.confirmPassword) {
 				newErrors.confirmPassword = 'Passwords do not match'
 			}
@@ -88,7 +109,7 @@ export function AdminSetup() {
 
 			try {
 				setErrors({})
-				await registerAdmin({
+				const result = await registerAdmin({
 					name: formData.name.trim(),
 					email: formData.email,
 					password: formData.password,
@@ -97,10 +118,24 @@ export function AdminSetup() {
 					housingType: formData.housingType,
 					otp: formData.otp
 				})
-				// Set success state to trigger redirect
-				setRegistrationSuccess(true)
+				// Only set success state if registration was actually successful
+				if (result && result.message === 'Admin account and society created successfully') {
+					setRegistrationSuccess(true)
+				}
 			} catch (error) {
-				setErrors({ submit: error.message || 'Registration failed' })
+				// Handle OTP errors specifically - stay on OTP step
+				const errorMessage = error.response?.data?.message || 'Registration failed'
+				
+				// Check if it's an OTP-related error
+				if (errorMessage.toLowerCase().includes('otp') || 
+					errorMessage.toLowerCase().includes('verification') ||
+					errorMessage.toLowerCase().includes('invalid') ||
+					errorMessage.toLowerCase().includes('expired')) {
+					setErrors({ otp: errorMessage })
+				} else {
+					// For other errors, show as general error
+					setErrors({ submit: errorMessage })
+				}
 			}
 		}
 	}
@@ -166,7 +201,7 @@ export function AdminSetup() {
 													id="password"
 													name="password"
 													type="password"
-													placeholder="Create a password"
+													placeholder="Create a password (min 6 chars, letters + numbers)"
 													value={formData.password}
 													onChange={handleChange}
 													className={errors.password ? 'border-[rgb(239,68,68)]' : ''}
@@ -174,6 +209,9 @@ export function AdminSetup() {
 												{errors.password && (
 													<p className="text-sm text-[rgb(239,68,68)]">{errors.password}</p>
 												)}
+												<p className="text-xs text-muted-foreground">
+													Password must be at least 6 characters with both letters and numbers
+												</p>
 											</div>
 
 											<div className="space-y-2">
@@ -318,28 +356,47 @@ export function AdminSetup() {
 										</div>
 									)}
 									
-									<div className="flex gap-3">
+									<div className="flex flex-col gap-3">
+										<div className="flex flex-col md:flex-row gap-3">
+											<Button 
+												type="button" 
+												variant="outline" 
+												className="flex-1"
+												onClick={() => setStep(1)}
+											>
+												Back
+											</Button>
+											<Button 
+												type="submit" 
+												variant="cta" 
+												className="flex-1"
+												disabled={isRegistering}
+											>
+												{isRegistering ? (
+													<div className="flex items-center space-x-2">
+														<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+														<span>Verifying...</span>
+													</div>
+												) : (
+													'Verify & Complete Registration'
+												)}
+											</Button>
+										</div>
+										
 										<Button 
 											type="button" 
-											variant="outline" 
-											className="flex-1"
-											onClick={() => setStep(1)}
+											variant="ghost" 
+											className="text-sm text-muted-foreground hover:text-primary"
+											onClick={handleResendOTP}
+											disabled={isResendingOTP}
 										>
-											Back
-										</Button>
-										<Button 
-											type="submit" 
-											variant="cta" 
-											className="flex-1"
-											disabled={isRegistering}
-										>
-											{isRegistering ? (
+											{isResendingOTP ? (
 												<div className="flex items-center space-x-2">
-													<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-													<span>Verifying...</span>
+													<div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+													<span>Resending...</span>
 												</div>
 											) : (
-												'Verify & Complete Registration'
+												"Didn't receive the code? Resend OTP"
 											)}
 										</Button>
 									</div>

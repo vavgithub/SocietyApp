@@ -7,6 +7,7 @@ import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout'
+import { showSuccessToast, showErrorToast } from '../lib/toast'
 
 export function Announcements() {
 	const { user } = useAuth()
@@ -34,9 +35,12 @@ export function Announcements() {
 			queryClient.invalidateQueries(['announcements'])
 			setIsAddingAnnouncement(false)
 			resetForm()
+			showSuccessToast('Announcement created successfully!')
 		},
 		onError: (error) => {
-			setErrors({ submit: error.response?.data?.message || 'Failed to create announcement' })
+			const errorMessage = error.response?.data?.message || 'Failed to create announcement'
+			setErrors({ submit: errorMessage })
+			showErrorToast(errorMessage)
 		}
 	})
 
@@ -47,9 +51,12 @@ export function Announcements() {
 			queryClient.invalidateQueries(['announcements'])
 			setEditingAnnouncement(null)
 			resetForm()
+			showSuccessToast('Announcement updated successfully!')
 		},
 		onError: (error) => {
-			setErrors({ submit: error.response?.data?.message || 'Failed to update announcement' })
+			const errorMessage = error.response?.data?.message || 'Failed to update announcement'
+			setErrors({ submit: errorMessage })
+			showErrorToast(errorMessage)
 		}
 	})
 
@@ -58,9 +65,12 @@ export function Announcements() {
 		mutationFn: announcementAPI.delete,
 		onSuccess: () => {
 			queryClient.invalidateQueries(['announcements'])
+			showSuccessToast('Announcement deleted successfully!')
 		},
 		onError: (error) => {
+			const errorMessage = error.response?.data?.message || 'Failed to delete announcement'
 			console.error('Failed to delete announcement:', error)
+			showErrorToast(errorMessage)
 		}
 	})
 
@@ -69,9 +79,12 @@ export function Announcements() {
 		mutationFn: ({ id, isActive }) => announcementAPI.toggleStatus(id, isActive),
 		onSuccess: () => {
 			queryClient.invalidateQueries(['announcements'])
+			showSuccessToast('Announcement status updated successfully!')
 		},
 		onError: (error) => {
+			const errorMessage = error.response?.data?.message || 'Failed to toggle announcement status'
 			console.error('Failed to toggle announcement status:', error)
+			showErrorToast(errorMessage)
 		}
 	})
 
