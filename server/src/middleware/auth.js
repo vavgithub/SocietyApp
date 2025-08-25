@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import User from '../models/User.js'
 
 export function requireAuth(req, res, next) {
-	const token = req.cookies.token
+	const token = req.cookies.userToken
 
 	if (!token) {
 		return res.status(401).json({ message: 'Access denied. No token provided.' })
