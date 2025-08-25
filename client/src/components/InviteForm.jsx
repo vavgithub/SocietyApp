@@ -1,0 +1,204 @@
+import React, { useState, useEffect } from 'react'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
+import { adminAPI, inviteAPI } from '../lib/api'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
+export function InviteForm({ role = 'tenant' }) {
+	const queryClient = useQueryClient()
+	const [formData, setFormData] = useState({
+		email: '',
+		role: role,
+		apartmentNumber: '',
+		flatNumber: '',
+		flatName: ''
+	})
+	const [showSuccess, setShowSuccess] = useState(false)
+	const [inviteLink, setInviteLink] = useState('')
+
+	// Fetch available units for tenant invites
+	const { data: availableUnits, isLoading: unitsLoading } = useQuery({
+		queryKey: ['available-units'],
+		queryFn: adminAPI.getAvailableUnits,
+		enabled: role === 'tenant'
+	})
+
+	// Generate invite mutation
+	const generateInviteMutation = useMutation({
+		mutationFn: inviteAPI.generateInvite,
+		onSuccess: (data) => {
+			setInviteLink(data.inviteLink)
+			setShowSuccess(true)
+			setFormData({
+				email: '',
+				role: role,
+				apartmentNumber: '',
+				flatNumber: '',
+				flatName: ''
+			})
+		}
+	})
+
+	const handleSubmit = (e) => {
+		e.preventDefault()
+		
+		const inviteData = {
+			email: formData.email,
+			role: formData.role
+		}
+
+		// Add apartment/flat information for tenants
+		if (formData.role === 'tenant') {
+			if (formData.apartmentNumber) {
+				inviteData.apartmentNumber = formData.apartmentNumber
+			}
+			if (formData.flatNumber) {
+				inviteData.flatNumber = formData.flatNumber
+			}
+			if (formData.flatName) {
+				inviteData.flatName = formData.flatName
+			}
+		}
+
+		generateInviteMutation.mutate(inviteData)
+	}
+
+	const copyToClipboard = () => {
+		navigator.clipboard.writeText(inviteLink)
+	}
+
+	const getTitle = () => {
+		return role === 'tenant' ? 'Invite New Tenant' : 'Invite New Guard'
+	}
+
+	const getDescription = () => {
+		return role === 'tenant' 
+			? 'Generate invite links for new tenants' 
+			: 'Generate invite links for new security guards'
+	}
+
+	const getButtonText = () => {
+		return role === 'tenant' ? 'Generate Tenant Invite' : 'Generate Guard Invite'
+	}
+
+	if (showSuccess) {
+		return (
+			<Card className="shadow-medium">
+				<CardHeader>
+					<CardTitle className="text-[rgb(22,163,74)]">Invite Generated Successfully!</CardTitle>
+					<CardDescription>
+						Share this link with the invited user. The link will expire in 15 minutes.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="p-3 bg-[rgb(240,253,244)] border border-[rgb(187,247,208)] rounded-lg">
+						<p className="text-sm font-medium text-[rgb(22,101,52)] mb-2">Invite Link:</p>
+						<p className="text-sm text-[rgb(22,101,52)] break-all">{inviteLink}</p>
+					</div>
+					<div className="flex gap-2">
+						<Button
+							onClick={copyToClipboard}
+							variant="outline"
+							className="flex-1"
+						>
+							Copy Link
+						</Button>
+						<Button
+							onClick={() => setShowSuccess(false)}
+							className="flex-1 bg-[rgb(22,163,74)] hover:bg-[rgb(21,128,61)]"
+						>
+							Generate Another Invite
+						</Button>
+					</div>
+				</CardContent>
+			</Card>
+		)
+	}
+
+	return (
+		<Card className="shadow-medium">
+			<CardHeader>
+				<CardTitle>{getTitle()}</CardTitle>
+				<CardDescription>
+					{getDescription()}
+				</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<form onSubmit={handleSubmit} className="space-y-4">
+					<div>
+						<Label htmlFor="email">Email Address</Label>
+						<Input
+							id="email"
+							type="email"
+							placeholder="Enter email address"
+							value={formData.email}
+							onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+							required
+						/>
+					</div>
+
+					{/* Villa/Flat selection for tenants */}
+					{role === 'tenant' && (
+						<div>
+							<Label>Villa/Flat Assignment</Label>
+							{unitsLoading ? (
+								<div className="mt-2 p-3 bg-[rgb(249,250,251)] border rounded-lg">
+									<div className="animate-pulse flex space-x-4">
+										<div className="flex-1 space-y-2 py-1">
+											<div className="h-4 bg-[rgb(229,231,235)] rounded"></div>
+											<div className="h-4 bg-[rgb(229,231,235)] rounded w-5/6"></div>
+										</div>
+									</div>
+								</div>
+							) : availableUnits?.availableUnits?.length > 0 ? (
+								<div className="mt-2">
+									<select
+										className="w-full p-2 border border-input rounded-md"
+										value={formData.apartmentNumber || formData.flatNumber || ''}
+										onChange={(e) => {
+											const selected = availableUnits.availableUnits.find(unit => unit.value === e.target.value)
+											if (selected) {
+												setFormData(prev => ({
+													...prev,
+													apartmentNumber: selected.value,
+													flatNumber: selected.value,
+													flatName: selected.flatName || ''
+												}))
+											}
+										}}
+									>
+										<option value="">Select a villa/flat</option>
+										{availableUnits.availableUnits.map((unit) => (
+											<option key={unit.value} value={unit.value}>
+												{unit.label}
+											</option>
+										))}
+									</select>
+									<p className="text-xs text-muted-foreground mt-1">
+										Choose the villa or flat number for this tenant
+									</p>
+								</div>
+							) : (
+								<div className="mt-2 p-3 bg-[rgb(254,242,242)] border border-[rgb(254,202,202)] rounded-lg">
+									<p className="text-sm text-[rgb(153,27,27)]">
+										No available villas/flats found. Please complete society enrollment first.
+									</p>
+								</div>
+							)}
+						</div>
+					)}
+
+					<Button
+						type="submit"
+						disabled={generateInviteMutation.isPending || (role === 'tenant' && !formData.apartmentNumber && !formData.flatNumber)}
+						className="w-full bg-[rgb(22,163,74)] hover:bg-[rgb(21,128,61)]"
+					>
+						{generateInviteMutation.isPending ? 'Generating...' : getButtonText()}
+					</Button>
+				</form>
+			</CardContent>
+		</Card>
+	)
+}
