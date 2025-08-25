@@ -113,7 +113,7 @@ router.post('/register-admin', [
 	)
 
 	// Set cookie
-	res.cookie('token', token, {
+	res.cookie('userToken', token, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',
 		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
@@ -180,7 +180,7 @@ router.post('/login', [
 	)
 
 	// Set cookie
-	res.cookie('token', token, {
+	res.cookie('userToken', token, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',
 		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
@@ -205,12 +205,7 @@ router.post('/login', [
 
 // Logout
 router.post('/logout', asyncHandler(async (req, res) => {
-	res.clearCookie('token', {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-			maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-		})
+	res.clearCookie('userToken')
 	res.json({ message: 'Logout successful' })
 }))
 

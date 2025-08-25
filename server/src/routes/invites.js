@@ -237,7 +237,7 @@ router.post('/accept', [
 	)
 
 	// Set cookie
-	res.cookie('token', authToken, {
+	res.cookie('userToken', authToken, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === 'production',
 		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
