@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ProtectedRoute, AdminRoute, AdminRouteWithoutEnrollmentCheck, TenantRoute, GuardRoute } from './components/ProtectedRoute'
 import { PWAUpdatePrompt } from './components/PWAUpdatePrompt'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
-import { PWAInstallButton } from './components/PWAInstallButton'
 import { AdminSetup } from './pages/AdminSetup'
 import { Announcements } from './pages/Announcements'
 import { CompleteEnrollment } from './pages/CompleteEnrollment'
@@ -441,7 +440,6 @@ export default function App() {
 					<AppRoutes />
 					<PWAUpdatePrompt />
 					<PWAInstallPrompt />
-					<PWAInstallButton />
 				</BrowserRouter>
 			</AuthProvider>
 		</QueryClientProvider>
