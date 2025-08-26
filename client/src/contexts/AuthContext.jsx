@@ -83,7 +83,16 @@ export function AuthProvider({ children }) {
 		}
 	}
 	
-	const logout = () => logoutMutation.mutate()
+	const logout = async () => {
+		try {
+			await logoutMutation.mutateAsync()
+			setUser(null)
+			queryClient.setQueryData(['user'], null)
+			queryClient.clear()
+		} catch (error) {
+			console.error('Logout failed:', error)
+		}
+	}
 	const registerAdmin = async (data) => {
 		try {
 			const result = await registerAdminMutation.mutateAsync(data)
