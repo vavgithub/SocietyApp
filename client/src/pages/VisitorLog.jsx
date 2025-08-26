@@ -23,6 +23,32 @@ export function VisitorLog() {
 	const [photoFile, setPhotoFile] = useState(null)
 	const [idCardFile, setIdCardFile] = useState(null)
 
+	// Helper function to get current local datetime in the format required by datetime-local input
+	const getCurrentLocalDateTime = () => {
+		const now = new Date()
+		// Format for datetime-local input (this represents local time to the user)
+		const localDateTime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
+		return localDateTime.toISOString().slice(0, 16)
+	}
+
+	// Helper function to convert datetime-local value to UTC ISO string for server
+	const convertLocalDateTimeToUTC = (localDateTimeString) => {
+		if (!localDateTimeString) return ''
+		// datetime-local value is in user's local timezone, convert to UTC
+		const localDate = new Date(localDateTimeString)
+		return localDate.toISOString()
+	}
+
+	// Initialize check-in datetime with current local time when adding a visitor
+	useEffect(() => {
+		if (isAddingVisitor && !formData.checkInDateTime) {
+			setFormData(prev => ({
+				...prev,
+				checkInDateTime: getCurrentLocalDateTime()
+			}))
+		}
+	}, [isAddingVisitor, formData.checkInDateTime])
+
 	// Fetch visitors data
 	const { data: todayVisitors, isLoading: todayLoading } = useQuery({
 		queryKey: ['visitors', 'today'],
@@ -51,11 +77,12 @@ export function VisitorLog() {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['visitors'] })
 			setIsAddingVisitor(false)
+			// Reset form with current datetime
 			setFormData({
 				name: '',
 				phoneNumber: '',
 				visitingApartment: '',
-				checkInDateTime: '',
+				checkInDateTime: getCurrentLocalDateTime(),
 				purpose: ''
 			})
 			setPhotoFile(null)
@@ -97,7 +124,8 @@ export function VisitorLog() {
 		formDataToSend.append('name', formData.name)
 		formDataToSend.append('phoneNumber', formData.phoneNumber)
 		formDataToSend.append('visitingApartment', formData.visitingApartment)
-		formDataToSend.append('checkInDateTime', formData.checkInDateTime)
+		// Convert local datetime to UTC before sending to server
+		formDataToSend.append('checkInDateTime', convertLocalDateTimeToUTC(formData.checkInDateTime))
 		formDataToSend.append('purpose', formData.purpose)
 		formDataToSend.append('photo', photoFile)
 		formDataToSend.append('idCardPhoto', idCardFile)
@@ -276,14 +304,29 @@ export function VisitorLog() {
 										)}
 									</div>
 									<div>
-										<Label htmlFor="checkInDateTime">Check-in Date & Time *</Label>
-										<Input
-											id="checkInDateTime"
-											type="datetime-local"
-											value={formData.checkInDateTime}
-											onChange={(e) => setFormData({ ...formData, checkInDateTime: e.target.value })}
-											required
-										/>
+										<Label htmlFor="checkInDateTime">Check-in Date & Time (Local) *</Label>
+										<div className="flex gap-2">
+											<Input
+												id="checkInDateTime"
+												type="datetime-local"
+												value={formData.checkInDateTime}
+												onChange={(e) => setFormData({ ...formData, checkInDateTime: e.target.value })}
+												className="flex-1"
+												required
+											/>
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												onClick={() => setFormData({ ...formData, checkInDateTime: getCurrentLocalDateTime() })}
+												className="px-3 whitespace-nowrap"
+											>
+												Now
+											</Button>
+										</div>
+										<p className="text-xs text-muted-foreground mt-1">
+											Enter the time in your local timezone. It will be automatically converted to UTC for storage.
+										</p>
 									</div>
 								</div>
 

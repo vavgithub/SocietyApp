@@ -97,10 +97,21 @@ router.post('/', requireAuth, requireRoles(['guard']), upload.fields([
 		return res.status(400).json({ message: 'Both visitor photo and ID card photo are required' })
 	}
 
-	// Validate check-in date is not in the future
+	// Validate check-in date is not in the future (proper UTC handling)
 	const checkInDate = new Date(checkInDateTime)
-	if (checkInDate > new Date()) {
-		return res.status(400).json({ message: 'Check-in date cannot be in the future' })
+	const currentTimeUTC = new Date()
+	
+	// Small tolerance (5 minutes) only for clock skew, not timezone differences
+	const clockSkewToleranceMs = 5 * 60 * 1000 // 5 minutes
+	const maxAllowedTime = new Date(currentTimeUTC.getTime() + clockSkewToleranceMs)
+	
+	if (checkInDate > maxAllowedTime) {
+		return res.status(400).json({ 
+			message: 'Check-in date cannot be in the future. Please ensure your system time is correct.',
+			serverTimeUTC: currentTimeUTC.toISOString(),
+			providedTimeUTC: checkInDate.toISOString(),
+			hint: 'Make sure to select the current local time in your timezone'
+		})
 	}
 
 	try {
