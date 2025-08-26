@@ -43,37 +43,6 @@ app.get('/api/health', (req, res) => {
 	})
 })
 
-// Debug endpoint to check cookies
-app.get('/api/debug/cookies', (req, res) => {
-	res.json({
-		cookies: req.cookies,
-		headers: {
-			cookie: req.headers.cookie,
-			origin: req.headers.origin,
-			referer: req.headers.referer
-		}
-	})
-})
-
-// Simple test endpoint to set a cookie
-app.get('/api/debug/test-cookie', (req, res) => {
-	res.cookie('testCookie', 'testValue', {
-		httpOnly: false,
-		secure: process.env.NODE_ENV === 'production',
-		sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-		maxAge: 60000 // 1 minute
-	})
-	res.json({ 
-		message: 'Test cookie set successfully',
-		instructions: 'Check your browser cookies for testCookie',
-		cookieSettings: {
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-			environment: process.env.NODE_ENV || 'development'
-		}
-	})
-})
-
 
 // API Routes
 app.use('/api/auth', authRouter)

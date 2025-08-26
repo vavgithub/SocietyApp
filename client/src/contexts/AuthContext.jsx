@@ -98,6 +98,19 @@ export function AuthProvider({ children }) {
 		queryClient.setQueryData(['user'], newUserData)
 	}
 
+	const refetchUser = async () => {
+		try {
+			const userData = await authAPI.getMe()
+			setUser(userData.user)
+			queryClient.setQueryData(['user'], userData.user)
+			return userData.user
+		} catch (error) {
+			console.error('Failed to refetch user:', error)
+			// Don't clear user data on refetch error, just log it
+			throw error
+		}
+	}
+
 	const value = {
 		user,
 		isLoading: isLoading || isUserLoading,
@@ -106,6 +119,7 @@ export function AuthProvider({ children }) {
 		logout,
 		registerAdmin,
 		updateUser,
+		refetchUser,
 		isAuthenticated: !!user,
 		loginError: loginMutation.error?.message,
 		registerError: registerAdminMutation.error?.message,

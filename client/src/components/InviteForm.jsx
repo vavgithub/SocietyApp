@@ -107,7 +107,7 @@ export function InviteForm({ role = 'tenant' }) {
 							✅ Invite link ready to share
 						</p>
 					</div>
-					<div className="flex gap-2">
+					<div className="flex flex-col md:flex-row gap-2">
 						<Button
 							onClick={copyToClipboard}
 							variant="outline"

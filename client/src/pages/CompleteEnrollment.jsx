@@ -11,7 +11,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 
 export function CompleteEnrollment() {
-	const { user } = useAuth()
+	const { user, refetchUser } = useAuth()
 	const queryClient = useQueryClient()
 	const navigate = useNavigate();
 
@@ -46,10 +46,19 @@ export function CompleteEnrollment() {
 	// Complete enrollment mutation
 	const completeEnrollmentMutation = useMutation({
 		mutationFn: adminAPI.completeEnrollment,
-		onSuccess: () => {
-			queryClient.invalidateQueries(['apartment'])
-			showSuccessToast('Society enrollment completed successfully!')
-			navigate('/admin')
+		onSuccess: async () => {
+			try {
+				// Refetch user data to update the context state
+				await refetchUser()
+				// Also invalidate apartment queries to ensure fresh data
+				queryClient.invalidateQueries(['apartment'])
+				showSuccessToast('Society enrollment completed successfully!')
+				// Navigation will happen automatically via useEffect when user state updates
+			} catch (error) {
+				console.error('Failed to refetch user after enrollment completion:', error)
+				// Even if refetch fails, still navigate to avoid being stuck
+				navigate('/admin')
+			}
 		},
 		onError: (error) => {
 			const errorMessage = error.response?.data?.message || 'Failed to complete enrollment'
@@ -58,10 +67,7 @@ export function CompleteEnrollment() {
 		}
 	})
 
-	// Redirect to admin dashboard after successful completion
-	if (completeEnrollmentMutation.isSuccess) {
-		return <Navigate to="/admin" replace />
-	}
+
 
 	const handleChange = (e) => {
 		const { name, value } = e.target
@@ -160,54 +166,114 @@ export function CompleteEnrollment() {
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 		
-		// Validation
+		// Clear previous errors
+		setErrors({})
+		
+		// Comprehensive validation
 		const newErrors = {}
 		
 		// Validate based on housing type
 		if (apartment?.housingType === 'villa') {
-			// Validate wings for villas
-			if (formData.wings.length === 0 || formData.wings.some(w => !w.name.trim() || !w.apartmentPrefix.trim() || !w.apartmentsPerFloor)) {
-				newErrors.wings = 'At least one wing with name, villa prefix, and villas per floor is required'
+			// Check if at least one wing exists
+			if (formData.wings.length === 0) {
+				newErrors.wings = 'At least one wing must be added for villa-type societies. Please click "Add Wing" to add wing information.'
+				newErrors.submit = 'Please add at least one wing before completing enrollment.'
+			} else {
+				// Validate each wing individually
+				let hasValidWing = false
+				formData.wings.forEach((wing, index) => {
+					let wingHasErrors = false
+					
+					if (!wing.name || !wing.name.trim()) {
+						newErrors[`wings.${index}.name`] = 'Wing name is required and cannot be empty'
+						wingHasErrors = true
+					}
+					if (!wing.apartmentPrefix || !wing.apartmentPrefix.trim()) {
+						newErrors[`wings.${index}.apartmentPrefix`] = 'Apartment prefix is required and cannot be empty'
+						wingHasErrors = true
+					}
+					if (!wing.apartmentsPerFloor || wing.apartmentsPerFloor < 1) {
+						newErrors[`wings.${index}.apartmentsPerFloor`] = 'Number of apartments must be at least 1'
+						wingHasErrors = true
+					}
+					
+					if (!wingHasErrors) {
+						hasValidWing = true
+					}
+				})
+				
+				// If no valid wings exist
+				if (!hasValidWing) {
+					newErrors.wings = 'At least one complete wing with all required fields must be provided'
+					newErrors.submit = 'Please fill in all required wing information before completing enrollment.'
+				}
 			}
-			
-			// Validate individual wing fields
-			formData.wings.forEach((wing, index) => {
-				if (!wing.name.trim()) {
-					newErrors[`wings.${index}.name`] = 'Wing name is required'
-				}
-				if (!wing.apartmentPrefix.trim()) {
-					newErrors[`wings.${index}.apartmentPrefix`] = 'Apartment prefix is required'
-				}
-				if (!wing.apartmentsPerFloor || wing.apartmentsPerFloor < 1) {
-					newErrors[`wings.${index}.apartmentsPerFloor`] = 'Number of apartments per floor must be at least 1'
-				}
-			})
 		} else if (apartment?.housingType === 'flat') {
-			// Validate flats
-			if (formData.flats.length === 0 || formData.flats.some(f => !f.name.trim() || !f.flatPrefix.trim() || !f.numberOfFloors || !f.roomsPerFloor)) {
-				newErrors.flats = 'At least one flat with name, flat prefix, floors, and rooms per floor is required'
+			// Check if at least one flat exists
+			if (formData.flats.length === 0) {
+				newErrors.flats = 'At least one flat building must be added for flat-type societies. Please click "Add Flat" to add flat information.'
+				newErrors.submit = 'Please add at least one flat building before completing enrollment.'
+			} else {
+				// Validate each flat individually
+				let hasValidFlat = false
+				formData.flats.forEach((flat, index) => {
+					let flatHasErrors = false
+					
+					if (!flat.name || !flat.name.trim()) {
+						newErrors[`flats.${index}.name`] = 'Flat name is required and cannot be empty'
+						flatHasErrors = true
+					}
+					if (!flat.flatPrefix || !flat.flatPrefix.trim()) {
+						newErrors[`flats.${index}.flatPrefix`] = 'Flat prefix is required and cannot be empty'
+						flatHasErrors = true
+					}
+					if (!flat.numberOfFloors || flat.numberOfFloors < 1) {
+						newErrors[`flats.${index}.numberOfFloors`] = 'Number of floors must be at least 1'
+						flatHasErrors = true
+					}
+					if (!flat.roomsPerFloor || flat.roomsPerFloor < 1) {
+						newErrors[`flats.${index}.roomsPerFloor`] = 'Number of rooms per floor must be at least 1'
+						flatHasErrors = true
+					}
+					
+					if (!flatHasErrors) {
+						hasValidFlat = true
+					}
+				})
+				
+				// If no valid flats exist
+				if (!hasValidFlat) {
+					newErrors.flats = 'At least one complete flat building with all required fields must be provided'
+					newErrors.submit = 'Please fill in all required flat information before completing enrollment.'
+				}
 			}
-			
-			// Validate individual flat fields
-			formData.flats.forEach((flat, index) => {
-				if (!flat.name.trim()) {
-					newErrors[`flats.${index}.name`] = 'Flat name is required'
-				}
-				if (!flat.flatPrefix.trim()) {
-					newErrors[`flats.${index}.flatPrefix`] = 'Flat prefix is required'
-				}
-				if (!flat.numberOfFloors || flat.numberOfFloors < 1) {
-					newErrors[`flats.${index}.numberOfFloors`] = 'Number of floors must be at least 1'
-				}
-				if (!flat.roomsPerFloor || flat.roomsPerFloor < 1) {
-					newErrors[`flats.${index}.roomsPerFloor`] = 'Number of rooms per floor must be at least 1'
-				}
-			})
 		}
 		
-		// Common validations
+		// Validate contact information (if provided)
+		if (formData.contactInfo.phone && formData.contactInfo.phone.trim()) {
+			const phoneRegex = /^[+]?[\d\s\-\(\)]{10,}$/
+			if (!phoneRegex.test(formData.contactInfo.phone.trim())) {
+				newErrors['contactInfo.phone'] = 'Please enter a valid phone number'
+			}
+		}
+		
+		if (formData.contactInfo.email && formData.contactInfo.email.trim()) {
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+			if (!emailRegex.test(formData.contactInfo.email.trim())) {
+				newErrors['contactInfo.email'] = 'Please enter a valid email address'
+			}
+		}
+		
+		// Check if there are validation errors
 		if (Object.keys(newErrors).length > 0) {
 			setErrors(newErrors)
+			// Scroll to the first error
+			const firstErrorElement = document.querySelector('.border-red-500')
+			if (firstErrorElement) {
+				firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+				firstErrorElement.focus()
+			}
+			showErrorToast('Please fix the validation errors before submitting.')
 			return
 		}
 
@@ -476,7 +542,11 @@ export function CompleteEnrollment() {
 											placeholder="Enter contact phone number"
 											value={formData.contactInfo.phone}
 											onChange={(e) => handleContactChange('phone', e.target.value)}
+											className={errors['contactInfo.phone'] ? 'border-red-500' : ''}
 										/>
+										{errors['contactInfo.phone'] && (
+											<p className="text-sm text-red-600">{errors['contactInfo.phone']}</p>
+										)}
 									</div>
 									
 									<div className="space-y-2">
@@ -487,7 +557,11 @@ export function CompleteEnrollment() {
 											placeholder="Enter contact email"
 											value={formData.contactInfo.email}
 											onChange={(e) => handleContactChange('email', e.target.value)}
+											className={errors['contactInfo.email'] ? 'border-red-500' : ''}
 										/>
+										{errors['contactInfo.email'] && (
+											<p className="text-sm text-red-600">{errors['contactInfo.email']}</p>
+										)}
 									</div>
 								</div>
 							</div>

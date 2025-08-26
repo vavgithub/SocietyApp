@@ -164,7 +164,25 @@ router.post('/complete-enrollment', requireAuth, requireRoles(['admin']), [
 ], asyncHandler(async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
-		return res.status(400).json({ message: 'Validation failed', errors: errors.array() })
+		// Create a more user-friendly error message for enrollment
+		const firstError = errors.array()[0]
+		const fieldName = firstError.path || firstError.param
+		let errorMessage = firstError.msg || 'Invalid input'
+		
+		// Make field names more user-friendly
+		if (fieldName?.includes('wings')) {
+			errorMessage = `Wing ${errorMessage.toLowerCase()}`
+		} else if (fieldName?.includes('flats')) {
+			errorMessage = `Flat ${errorMessage.toLowerCase()}`
+		} else if (fieldName?.includes('contactInfo')) {
+			errorMessage = `Contact ${errorMessage.toLowerCase()}`
+		}
+		
+		return res.status(400).json({ 
+			message: errorMessage, 
+			errors: errors.array(),
+			field: fieldName
+		})
 	}
 
 	const { totalUnits, contactInfo, additionalInfo, wings, flats } = req.body
@@ -176,27 +194,71 @@ router.post('/complete-enrollment', requireAuth, requireRoles(['admin']), [
 
 	// Validate based on housing type
 	if (apartment.housingType === 'villa' && (!wings || wings.length === 0)) {
-		return res.status(400).json({ message: 'At least one wing is required for villas' })
+		return res.status(400).json({ 
+			message: 'At least one wing must be added for villa-type societies. Please add wing information before completing enrollment.',
+			field: 'wings'
+		})
 	}
 	
 	if (apartment.housingType === 'flat' && (!flats || flats.length === 0)) {
-		return res.status(400).json({ message: 'At least one flat is required for flats' })
+		return res.status(400).json({ 
+			message: 'At least one flat building must be added for flat-type societies. Please add flat information before completing enrollment.',
+			field: 'flats'
+		})
 	}
 
 	// Validate wing structure for villas
 	if (apartment.housingType === 'villa' && wings) {
-		for (const wing of wings) {
-			if (!wing.name || !wing.apartmentPrefix || !wing.apartmentsPerFloor) {
-				return res.status(400).json({ message: 'All wing fields are required: name, apartmentPrefix, apartmentsPerFloor' })
+		for (let i = 0; i < wings.length; i++) {
+			const wing = wings[i]
+			if (!wing.name || !wing.name.trim()) {
+				return res.status(400).json({ 
+					message: `Wing ${i + 1}: Wing name is required and cannot be empty.`,
+					field: `wings[${i}].name`
+				})
+			}
+			if (!wing.apartmentPrefix || !wing.apartmentPrefix.trim()) {
+				return res.status(400).json({ 
+					message: `Wing ${i + 1}: Apartment prefix is required and cannot be empty.`,
+					field: `wings[${i}].apartmentPrefix`
+				})
+			}
+			if (!wing.apartmentsPerFloor || wing.apartmentsPerFloor < 1) {
+				return res.status(400).json({ 
+					message: `Wing ${i + 1}: Number of apartments must be at least 1.`,
+					field: `wings[${i}].apartmentsPerFloor`
+				})
 			}
 		}
 	}
 
 	// Validate flat structure for flats
 	if (apartment.housingType === 'flat' && flats) {
-		for (const flat of flats) {
-			if (!flat.name || !flat.flatPrefix || !flat.numberOfFloors || !flat.roomsPerFloor) {
-				return res.status(400).json({ message: 'All flat fields are required: name, flatPrefix, numberOfFloors, roomsPerFloor' })
+		for (let i = 0; i < flats.length; i++) {
+			const flat = flats[i]
+			if (!flat.name || !flat.name.trim()) {
+				return res.status(400).json({ 
+					message: `Flat ${i + 1}: Flat name is required and cannot be empty.`,
+					field: `flats[${i}].name`
+				})
+			}
+			if (!flat.flatPrefix || !flat.flatPrefix.trim()) {
+				return res.status(400).json({ 
+					message: `Flat ${i + 1}: Flat prefix is required and cannot be empty.`,
+					field: `flats[${i}].flatPrefix`
+				})
+			}
+			if (!flat.numberOfFloors || flat.numberOfFloors < 1) {
+				return res.status(400).json({ 
+					message: `Flat ${i + 1}: Number of floors must be at least 1.`,
+					field: `flats[${i}].numberOfFloors`
+				})
+			}
+			if (!flat.roomsPerFloor || flat.roomsPerFloor < 1) {
+				return res.status(400).json({ 
+					message: `Flat ${i + 1}: Number of rooms per floor must be at least 1.`,
+					field: `flats[${i}].roomsPerFloor`
+				})
 			}
 		}
 	}
