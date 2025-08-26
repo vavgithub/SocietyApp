@@ -22,7 +22,7 @@ export function LoginPage() {
 	// Redirect if already authenticated
 	useEffect(() => {
 		if (isAuthenticated && user) {
-			const returnTo = location.state?.from?.pathname || getDashboardPath(user.role)
+			const returnTo =  getDashboardPath(user.role)
 			navigate(returnTo, { replace: true })
 		}
 	}, [isAuthenticated, user, navigate, location])
