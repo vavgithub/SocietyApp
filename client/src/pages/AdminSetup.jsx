@@ -24,7 +24,7 @@ export function AdminSetup() {
 	const [isRequestingOTP, setIsRequestingOTP] = useState(false)
 	const [isResendingOTP, setIsResendingOTP] = useState(false)
 	
-	const { registerAdmin, isRegistering } = useAuth()
+	const { registerAdmin, isRegistering , refetchUser } = useAuth()
 	const [registrationSuccess, setRegistrationSuccess] = useState(false)
 
 	// If registration was successful, redirect to complete enrollment
@@ -121,6 +121,7 @@ export function AdminSetup() {
 				// Only set success state if registration was actually successful
 				if (result && result.message === 'Admin account and society created successfully') {
 					setRegistrationSuccess(true)
+					refetchUser()
 				}
 			} catch (error) {
 				// Handle OTP errors specifically - stay on OTP step
