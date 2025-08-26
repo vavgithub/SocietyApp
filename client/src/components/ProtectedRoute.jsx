@@ -50,19 +50,13 @@ export function ProtectedRoute({ children, allowedRoles = [] }) {
 
 // Component to check enrollment completion for admin routes
 export function AdminEnrollmentCheck({ children }) {
-	const { user } = useAuth()
+	const { user , isLoading } = useAuth()
 	
 	// Only check enrollment for admin users
 	if (user?.role !== 'admin') {
 		return children
 	}
 
-	// Fetch apartment data to check enrollment status
-	const { data: apartment, isLoading } = useQuery({
-		queryKey: ['apartment'],
-		queryFn: adminAPI.getApartment,
-		enabled: user?.role === 'admin',
-	})
 
 	// Show loading while checking enrollment
 	if (isLoading) {
@@ -77,7 +71,7 @@ export function AdminEnrollmentCheck({ children }) {
 	}
 
 	// If enrollment is not complete, redirect to complete enrollment page
-	if (apartment && !apartment.isEnrollmentComplete) {
+	if (user.apartmentId && !user.apartmentId.isEnrollmentComplete) {
 		return <Navigate to="/complete-enrollment" replace />
 	}
 
