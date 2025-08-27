@@ -8,6 +8,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Navbar } from '../components/Navbar'
 import { showSuccessToast } from '../lib/toast'
 
+export const getDashboardPath = (role) => {
+	switch (role) {
+		case 'admin':
+			return '/admin'
+		case 'tenant':
+			return '/tenant'
+		case 'guard':
+			return '/guard'
+		default:
+			return '/'
+	}
+}
+
 export function LoginPage() {
 	const [formData, setFormData] = useState({
 		email: '',
@@ -28,18 +41,6 @@ export function LoginPage() {
 	}, [isAuthenticated, user, navigate, location])
 
 	// Helper function to get dashboard path based on role
-	const getDashboardPath = (role) => {
-		switch (role) {
-			case 'admin':
-				return '/admin'
-			case 'tenant':
-				return '/tenant'
-			case 'guard':
-				return '/guard'
-			default:
-				return '/'
-		}
-	}
 
 	const handleChange = (e) => {
 		const { name, value } = e.target

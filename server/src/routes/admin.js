@@ -29,18 +29,25 @@ router.get('/available-units', requireAuth, requireRoles(['admin']), asyncHandle
 
 	const availableUnits = []
 
+	// Get all registered users with their apartment/flat assignments
+	const registeredUsers = await User.find({
+		apartmentId: req.user.apartmentId,
+		role: 'tenant',
+		isActive: true
+	})
+
 	if (apartment.housingType === 'villa' && apartment.enrollmentData.wings) {
 		// Generate villa numbers for each wing (villas are single-floor structures)
 		apartment.enrollmentData.wings.forEach(wing => {
 			for (let apt = 1; apt <= wing.apartmentsPerFloor; apt++) {
 				const apartmentNumber = `${wing.apartmentPrefix}${apt.toString().padStart(2, '0')}`
 				
-				// Check if this apartment is already assigned
-				const isAssigned = apartment.invitedUsers.some(invite => 
-					invite.apartmentNumber === apartmentNumber && invite.isRegistered
+				// Check if this apartment is already occupied by a registered tenant
+				const isOccupied = registeredUsers.some(user => 
+					user.apartmentNumber === apartmentNumber
 				)
 				
-				if (!isAssigned) {
+				if (!isOccupied) {
 					availableUnits.push({
 						value: apartmentNumber,
 						label: `${apartmentNumber} (${wing.name})`
@@ -56,12 +63,12 @@ router.get('/available-units', requireAuth, requireRoles(['admin']), asyncHandle
 					const flatNumber = `${flat.flatPrefix}${floor.toString().padStart(2, '0')}${room.toString().padStart(2, '0')}`
 					const flatName = `${flat.name} - Floor ${floor} - Room ${room}`
 					
-					// Check if this flat is already assigned
-					const isAssigned = apartment.invitedUsers.some(invite => 
-						(invite.flatNumber === flatNumber || invite.flatName === flatName) && invite.isRegistered
+					// Check if this flat is already occupied by a registered tenant
+					const isOccupied = registeredUsers.some(user => 
+						user.flatNumber === flatNumber || user.flatName === flatName
 					)
 					
-					if (!isAssigned) {
+					if (!isOccupied) {
 						availableUnits.push({
 							value: flatNumber,
 							label: `${flatNumber} (${flatName})`,

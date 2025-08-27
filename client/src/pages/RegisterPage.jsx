@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { inviteAPI } from '../lib/api'
 import { Button } from '../components/ui/button'
@@ -7,6 +7,8 @@ import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Navbar } from '../components/Navbar'
+import { useAuth } from '../contexts/AuthContext'
+import { getDashboardPath } from './LoginPage'
 
 export function RegisterPage() {
 	const [searchParams] = useSearchParams()
@@ -23,6 +25,15 @@ export function RegisterPage() {
 	const [errors, setErrors] = useState({})
 	const [isRequestingOTP, setIsRequestingOTP] = useState(false)
 	const [isResendingOTP, setIsResendingOTP] = useState(false)
+	const { user , isAuthenticated } = useAuth();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (isAuthenticated && user) {
+			const returnTo =  getDashboardPath(user.role)
+			navigate(returnTo, { replace: true })
+		}
+	}, [isAuthenticated,user])
 
 	const registerMutation = useMutation({
 		mutationFn: (data) => inviteAPI.acceptInvite(token, data),

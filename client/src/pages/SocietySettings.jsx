@@ -197,7 +197,7 @@ export function SocietySettings() {
 						<form onSubmit={handleSubmit} className="space-y-6">
 							{/* Basic Information */}
 							<div className="space-y-4">
-								<h3 className="text-lg font-semibold text-foreground border-b pb-2">Basic Information</h3>
+								<h3 className="text-lg font-semibold text-foreground ">Basic Information</h3>
 								
 								<div className="grid md:grid-cols-2 gap-4">
 									<div>
@@ -265,7 +265,7 @@ export function SocietySettings() {
 															{apartment?.housingType === 'villa' && (
 								<div className="space-y-4">
 									<div className="flex items-center justify-between">
-										<h3 className="text-lg font-semibold text-foreground border-b pb-2">Wings Configuration (Apartments are like villas - single floor)</h3>
+										<h3 className="text-lg font-semibold text-foreground  ">Wings Configuration (Apartments are like villas - single floor)</h3>
 										{isEditing && (
 											<Button type="button" onClick={addWing} variant="outline" size="sm">
 												+ Add Wing
@@ -331,7 +331,7 @@ export function SocietySettings() {
 							{apartment?.housingType === 'flat' && (
 								<div className="space-y-4">
 									<div className="flex items-center justify-between">
-										<h3 className="text-lg font-semibold text-foreground border-b pb-2">Flats Configuration</h3>
+										<h3 className="text-lg font-semibold text-foreground">Flats Configuration</h3>
 										{isEditing && (
 											<Button type="button" onClick={addFlat} variant="outline" size="sm">
 												+ Add Flat
@@ -340,7 +340,7 @@ export function SocietySettings() {
 									</div>
 									
 									{formData.enrollmentData.flats.map((flat, index) => (
-										<div key={index} className="border rounded-lg p-4 space-y-4">
+										<div key={index} className="border border-border rounded-lg p-4 space-y-4">
 											<div className="flex items-center justify-between">
 												<h4 className="font-medium">Flat {index + 1}</h4>
 												{isEditing && formData.enrollmentData.flats.length > 1 && (
@@ -405,12 +405,16 @@ export function SocietySettings() {
 							)}
 
 							{/* Action Buttons */}
-							<div className="flex gap-4 pt-4">
+							<div className="flex  gap-4 pt-4">
 								{!isEditing ? (
 									<Button
 										type="button"
-										onClick={() => setIsEditing(true)}
-										className="bg-[rgb(59,130,246)] hover:bg-[rgb(37,99,235)]"
+										onClick={(e) => {
+											e.preventDefault()
+											e.stopPropagation()
+											setIsEditing(true)
+										}}
+										className="bg-primary hover:bg-primary/90"
 									>
 										Edit Society
 									</Button>
@@ -424,7 +428,9 @@ export function SocietySettings() {
 										</Button>
 										<Button
 											type="button"
-											onClick={() => {
+											onClick={(e) => {
+												e.preventDefault()
+												e.stopPropagation()
 												setIsEditing(false)
 												// Reset form data to original values
 												if (apartment) {

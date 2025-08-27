@@ -6,7 +6,7 @@ import { asyncHandler } from '../middleware/error.js'
 import { requireAuth, requireRoles } from '../middleware/auth.js'
 import User from '../models/User.js'
 import Apartment from '../models/Apartment.js'
-import { generateOTP, storeOTP, verifyOTP, sendOTP } from '../lib/otpManager.js'
+import { generateOTP, storeOTP, verifyOTP, sendOTP, sendInviteEmail } from '../lib/otpManager.js'
 
 const router = express.Router()
 
@@ -135,9 +135,19 @@ router.post('/generate', requireAuth, requireRoles(['admin']), [
 	// Create invite link
 	const inviteLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/register?token=${inviteToken}`
 
+	// Send invite email
+	const emailResult = await sendInviteEmail(email, inviteLink, role, apartment.name)
+	
+	if (!emailResult.success) {
+		// Remove the invite from the apartment if email fails
+		apartment.invitedUsers = apartment.invitedUsers.filter(invite => invite.email !== email)
+		await apartment.save()
+		return res.status(500).json({ message: 'Failed to send invite email. Please try again.' })
+	}
+
 	res.json({
-		message: 'Invite generated successfully',
-		inviteLink,
+		message: 'Invite sent successfully',
+		inviteLink, // Still return the link for admin to copy if needed
 		expiresIn: '15 minutes'
 	})
 }))

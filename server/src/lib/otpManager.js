@@ -67,6 +67,66 @@ function verifyOTP(email, otp, purpose) {
 	}
 }
 
+// Send invite email
+async function sendInviteEmail(email, inviteLink, role, apartmentName) {
+	const subject = 'SocietySync - You\'ve Been Invited to Join!'
+	
+	const roleText = role === 'tenant' ? 'Tenant' : 'Security Guard'
+	
+	const html = `
+		<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+			<div style="background: linear-gradient(135deg, #0a6802 0%, #16a34a 100%); padding: 20px; text-align: center;">
+				<h1 style="color: white; margin: 0; font-size: 24px;">SocietySync</h1>
+				<p style="color: white; margin: 5px 0 0 0; font-size: 14px;">Smart Community Management</p>
+			</div>
+			
+			<div style="padding: 30px; background: #f9fafb;">
+				<h2 style="color: #1f2937; margin-bottom: 20px;">You've Been Invited!</h2>
+				
+				<p style="color: #6b7280; line-height: 1.6; margin-bottom: 25px;">
+					You have been invited to join <strong>${apartmentName}</strong> as a <strong>${roleText}</strong> 
+					on SocietySync - the smart community management platform.
+				</p>
+				
+				<div style="background: white; border: 2px solid #e5e7eb; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
+					<p style="color: #6b7280; margin-bottom: 15px;">Click the button below to accept your invitation:</p>
+					<a href="${inviteLink}" style="display: inline-block; background: linear-gradient(135deg, #0a6802 0%, #16a34a 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+						Accept Invitation
+					</a>
+				</div>
+				
+				<p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">
+					<strong>Important:</strong>
+					<ul style="color: #6b7280; font-size: 14px; margin: 10px 0;">
+						<li>This invitation link will expire in 15 minutes</li>
+						<li>If you didn't expect this invitation, please ignore this email</li>
+					</ul>
+				</p>
+				
+				<div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px;">
+					<p style="color: #9ca3af; font-size: 12px; margin: 0;">
+						This is an automated message from SocietySync. Please do not reply to this email.
+					</p>
+				</div>
+			</div>
+		</div>
+	`
+	
+	try {
+		await transporter.sendMail({
+			from: process.env.EMAIL_USER,
+			to: email,
+			subject: subject,
+			html: html
+		})
+		
+		return { success: true, message: 'Invite email sent successfully' }
+	} catch (error) {
+		console.error('Error sending invite email:', error)
+		return { success: false, message: 'Failed to send invite email' }
+	}
+}
+
 // Send OTP via email
 async function sendOTP(email, otp, purpose) {
 	const subject = purpose === 'admin-registration' 
@@ -153,5 +213,6 @@ export {
 	storeOTP,
 	verifyOTP,
 	sendOTP,
+	sendInviteEmail,
 	cleanupExpiredOTPs
 }

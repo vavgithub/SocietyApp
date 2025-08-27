@@ -19,6 +19,7 @@ export function InviteForm({ role = 'tenant' }) {
 	})
 	const [showSuccess, setShowSuccess] = useState(false)
 	const [inviteLink, setInviteLink] = useState('')
+	const [sentEmail, setSentEmail] = useState('')
 
 	// Fetch available units for tenant invites
 	const { data: availableUnits, isLoading: unitsLoading } = useQuery({
@@ -32,9 +33,8 @@ export function InviteForm({ role = 'tenant' }) {
 		mutationFn: inviteAPI.generateInvite,
 		onSuccess: (data) => {
 			setInviteLink(data.inviteLink)
-			// Automatically copy to clipboard
-			navigator.clipboard.writeText(data.inviteLink)
-			showSuccessToast('Invite URL copied to clipboard!')
+			setSentEmail(formData.email) // Store the email before resetting form
+			showSuccessToast('Invite sent successfully to the provided email!')
 			setShowSuccess(true)
 			setFormData({
 				email: '',
@@ -46,7 +46,7 @@ export function InviteForm({ role = 'tenant' }) {
 		},
 		onError: (error) => {
 			console.log(error)
-			showErrorToast(error.response?.data?.message || 'Failed to generate invite')
+			showErrorToast(error.response?.data?.message || 'Failed to send invite')
 		}
 	})
 
@@ -80,32 +80,32 @@ export function InviteForm({ role = 'tenant' }) {
 	}
 
 	const getTitle = () => {
-		return role === 'tenant' ? 'Invite New Tenant' : 'Invite New Guard'
+		return role === 'tenant' ? 'Send Tenant Invite' : 'Send Guard Invite'
 	}
 
 	const getDescription = () => {
 		return role === 'tenant' 
-			? 'Generate invite links for new tenants' 
-			: 'Generate invite links for new security guards'
+			? 'Send invite emails to new tenants' 
+			: 'Send invite emails to new security guards'
 	}
 
 	const getButtonText = () => {
-		return role === 'tenant' ? 'Generate Tenant Invite' : 'Generate Guard Invite'
+		return role === 'tenant' ? 'Send Tenant Invite' : 'Send Guard Invite'
 	}
 
 	if (showSuccess) {
 		return (
 			<Card className="shadow-medium">
 				<CardHeader>
-					<CardTitle className="text-primary">Invite Generated Successfully!</CardTitle>
+					<CardTitle className="text-primary">Invite Sent Successfully!</CardTitle>
 					<CardDescription>
-						The invite link has been generated and copied to your clipboard. Share it with the invited user. The link will expire in 15 minutes.
+						The invite link has been sent to the provided email address. The recipient will receive a joining link that expires in 15 minutes.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<div className="p-3 bg-secondary border border-border rounded-lg">
 						<p className="text-sm font-medium text-secondary-foreground">
-							✅ Invite link ready to share
+							✅ Invite email sent to {sentEmail}
 						</p>
 					</div>
 					<div className="flex flex-col md:flex-row gap-2">
@@ -114,13 +114,13 @@ export function InviteForm({ role = 'tenant' }) {
 							variant="outline"
 							className="flex-1"
 						>
-							Copy Link Again
+							Copy Link
 						</Button>
 						<Button
 							onClick={() => setShowSuccess(false)}
 							className="flex-1"
 						>
-							Generate Another Invite
+							Send Another Invite
 						</Button>
 					</div>
 				</CardContent>
