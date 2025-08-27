@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
+import { Modal, ModalHeader, ModalContent, ModalFooter } from '../components/ui/modal'
+import { Select } from '../components/ui/select'
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout'
 import { visitorAPI, guardAPI } from '../lib/api'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -177,7 +179,7 @@ export function VisitorLog() {
 							<CardTitle>Active Visitors</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<div className="text-3xl font-bold text-[rgb(22,163,74)]">
+							<div className="text-3xl font-bold text-primary">
 								{statsLoading ? '...' : stats?.activeVisitors || 0}
 							</div>
 						</CardContent>
@@ -188,7 +190,7 @@ export function VisitorLog() {
 							<CardTitle>Total Visitors</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<div className="text-3xl font-bold text-[rgb(59,130,246)]">
+							<div className="text-3xl font-bold text-primary">
 								{statsLoading ? '...' : stats?.totalVisitors || 0}
 							</div>
 						</CardContent>
@@ -199,168 +201,12 @@ export function VisitorLog() {
 				<div className="mb-6">
 					<Button
 						onClick={() => setIsAddingVisitor(true)}
-						className="bg-[rgb(22,163,74)] hover:bg-[rgb(21,128,61)]"
 					>
 						+ Add New Visitor
 					</Button>
 				</div>
 
-				{/* Add Visitor Form */}
-				{isAddingVisitor && (
-					<Card className="mb-8 shadow-medium">
-						<CardHeader>
-							<CardTitle>Add New Visitor</CardTitle>
-							<CardDescription>Enter visitor details and check them in</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<form onSubmit={handleSubmit} className="space-y-4">
-								<div className="grid md:grid-cols-2 gap-4">
-									<div>
-										<Label htmlFor="name">Visitor Name *</Label>
-										<Input
-											id="name"
-											value={formData.name}
-											onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-											required
-										/>
-									</div>
-									<div>
-										<Label htmlFor="phoneNumber">Phone Number *</Label>
-										<Input
-											id="phoneNumber"
-											type="tel"
-											value={formData.phoneNumber}
-											onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-											required
-										/>
-									</div>
-								</div>
 
-								<div className="grid md:grid-cols-2 gap-4">
-									<div>
-										<Label htmlFor="photo">Visitor Photo *</Label>
-										<Input
-											id="photo"
-											type="file"
-											accept="image/*"
-											onChange={(e) => setPhotoFile(e.target.files[0])}
-											required
-										/>
-										{photoFile && (
-											<p className="text-sm text-muted-foreground mt-1">
-												Selected: {photoFile.name}
-											</p>
-										)}
-									</div>
-									<div>
-										<Label htmlFor="idCardPhoto">ID Card Photo *</Label>
-										<Input
-											id="idCardPhoto"
-											type="file"
-											accept="image/*"
-											onChange={(e) => setIdCardFile(e.target.files[0])}
-											required
-										/>
-										{idCardFile && (
-											<p className="text-sm text-muted-foreground mt-1">
-												Selected: {idCardFile.name}
-											</p>
-										)}
-									</div>
-								</div>
-
-								<div className="grid md:grid-cols-2 gap-4">
-									<div>
-										<Label htmlFor="visitingApartment">Visiting Villa/Flat *</Label>
-										{unitsLoading ? (
-											<div className="mt-2 p-3 bg-[rgb(249,250,251)] border rounded-lg">
-												<div className="animate-pulse flex space-x-4">
-													<div className="flex-1 space-y-2 py-1">
-														<div className="h-4 bg-[rgb(229,231,235)] rounded"></div>
-													</div>
-												</div>
-											</div>
-										) : occupiedUnits?.occupiedUnits?.length > 0 ? (
-											<select
-												id="visitingApartment"
-												className="w-full p-2 border border-input rounded-md"
-												value={formData.visitingApartment}
-												onChange={(e) => setFormData({ ...formData, visitingApartment: e.target.value })}
-												required
-											>
-												<option value="">Select an apartment/flat</option>
-												{occupiedUnits.occupiedUnits.map((unit) => (
-													<option key={unit.value} value={unit.value}>
-														{unit.label}
-													</option>
-												))}
-											</select>
-										) : (
-											<div className="mt-2 p-3 bg-[rgb(254,242,242)] border border-[rgb(254,202,202)] rounded-lg">
-												<p className="text-sm text-[rgb(153,27,27)]">
-													No occupied apartments/flats found. Please ensure tenants have registered first.
-												</p>
-											</div>
-										)}
-									</div>
-									<div>
-										<Label htmlFor="checkInDateTime">Check-in Date & Time (Local) *</Label>
-										<div className="flex gap-2">
-											<Input
-												id="checkInDateTime"
-												type="datetime-local"
-												value={formData.checkInDateTime}
-												onChange={(e) => setFormData({ ...formData, checkInDateTime: e.target.value })}
-												className="flex-1"
-												required
-											/>
-											<Button
-												type="button"
-												variant="outline"
-												size="sm"
-												onClick={() => setFormData({ ...formData, checkInDateTime: getCurrentLocalDateTime() })}
-												className="px-3 whitespace-nowrap"
-											>
-												Now
-											</Button>
-										</div>
-										<p className="text-xs text-muted-foreground mt-1">
-											Enter the time in your local timezone. It will be automatically converted to UTC for storage.
-										</p>
-									</div>
-								</div>
-
-								<div>
-									<Label htmlFor="purpose">Purpose of Visit *</Label>
-									<Input
-										id="purpose"
-										placeholder="e.g., Meeting, Delivery, Maintenance, etc."
-										value={formData.purpose}
-										onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-										required
-									/>
-								</div>
-
-								<div className="flex gap-4">
-									<Button
-										type="submit"
-										disabled={createVisitorMutation.isPending}
-										className="bg-[rgb(22,163,74)] hover:bg-[rgb(21,128,61)]"
-									>
-										{createVisitorMutation.isPending ? 'Adding...' : 'Add Visitor'}
-									</Button>
-									<Button
-										type="button"
-										variant="outline"
-										onClick={() => setIsAddingVisitor(false)}
-									>
-										Cancel
-									</Button>
-								</div>
-							</form>
-						</CardContent>
-					</Card>
-				)}
 
 				{/* Active Visitors */}
 				<Card className="mb-8 shadow-medium">
@@ -407,7 +253,7 @@ export function VisitorLog() {
 												onClick={() => handleCheckout(visitor._id)}
 												disabled={checkoutMutation.isPending}
 												variant="outline"
-												className="text-[rgb(153,27,27)] border-[rgb(254,202,202)] hover:bg-[rgb(254,226,226)]"
+												className="text-destructive-foreground border-destructive-foreground/60 hover:bg-destructive-foreground/10"
 											>
 												{checkoutMutation.isPending ? 'Checking out...' : 'Check Out'}
 											</Button>
@@ -472,8 +318,8 @@ export function VisitorLog() {
 											<div className="flex flex-col items-end space-y-2">
 												<div className={`px-2 py-1 text-xs rounded ${
 													visitor.status === 'checked-in'
-														? 'bg-[rgb(220,252,231)] text-[rgb(22,101,52)]'
-														: 'bg-[rgb(254,226,226)] text-[rgb(153,27,27)]'
+														? 'bg-secondary text-secondary-foreground'
+														: 'bg-destructive text-destructive-foreground'
 												}`}>
 													{visitor.status === 'checked-in' ? 'Active' : 'Checked Out'}
 												</div>
@@ -483,7 +329,7 @@ export function VisitorLog() {
 														disabled={checkoutMutation.isPending}
 														variant="outline"
 														size="sm"
-														className="text-[rgb(153,27,27)] border-[rgb(254,202,202)] hover:bg-[rgb(254,226,226)]"
+														className="text-destructive-foreground border-destructive-foreground/60 hover:bg-[rgb(254,226,226)]"
 													>
 														Check Out
 													</Button>
@@ -501,6 +347,171 @@ export function VisitorLog() {
 					</CardContent>
 				</Card>
 			</div>
+
+			{/* Add Visitor Modal */}
+			<Modal 
+				isOpen={isAddingVisitor} 
+				onClose={() => setIsAddingVisitor(false)}
+				className="max-w-2xl"
+			>
+				<ModalHeader>
+					<div>
+						<h2 className="text-lg font-semibold text-foreground">Add New Visitor</h2>
+						<p className="text-sm text-muted-foreground">Enter visitor details and check them in</p>
+					</div>
+				</ModalHeader>
+				
+				<ModalContent>
+					<form id="visitor-form" onSubmit={handleSubmit} className="space-y-4">
+						<div className="grid md:grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="name">Visitor Name *</Label>
+								<Input
+									id="name"
+									value={formData.name}
+									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+									required
+								/>
+							</div>
+							<div>
+								<Label htmlFor="phoneNumber">Phone Number *</Label>
+								<Input
+									id="phoneNumber"
+									type="tel"
+									value={formData.phoneNumber}
+									onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+									required
+								/>
+							</div>
+						</div>
+
+						<div className="grid md:grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="photo">Visitor Photo *</Label>
+								<Input
+									id="photo"
+									type="file"
+									accept="image/*"
+									onChange={(e) => setPhotoFile(e.target.files[0])}
+									required
+								/>
+								{photoFile && (
+									<p className="text-sm text-muted-foreground mt-1">
+										Selected: {photoFile.name}
+									</p>
+								)}
+							</div>
+							<div>
+								<Label htmlFor="idCardPhoto">ID Card Photo *</Label>
+								<Input
+									id="idCardPhoto"
+									type="file"
+									accept="image/*"
+									onChange={(e) => setIdCardFile(e.target.files[0])}
+									required
+								/>
+								{idCardFile && (
+									<p className="text-sm text-muted-foreground mt-1">
+										Selected: {idCardFile.name}
+									</p>
+								)}
+							</div>
+						</div>
+
+						<div className="grid md:grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="visitingApartment">Visiting Villa/Flat *</Label>
+								{unitsLoading ? (
+									<div className="mt-2 p-3 bg-muted border rounded-lg">
+										<div className="animate-pulse flex space-x-4">
+											<div className="flex-1 space-y-2 py-1">
+												<div className="h-4 bg-border rounded"></div>
+											</div>
+										</div>
+									</div>
+								) : occupiedUnits?.occupiedUnits?.length > 0 ? (
+									<Select
+										id="visitingApartment"
+										options={[
+											{ value: "", label: "Select an apartment/flat" },
+											...occupiedUnits.occupiedUnits
+										]}
+										value={formData.visitingApartment}
+										onChange={(value) => setFormData({ ...formData, visitingApartment: value })}
+										placeholder="Select an apartment/flat"
+									/>
+								) : (
+									<div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+										<p className="text-sm text-destructive">
+											No occupied apartments/flats found. Please ensure tenants have registered first.
+										</p>
+									</div>
+								)}
+							</div>
+							<div>
+								<Label htmlFor="checkInDateTime">Check-in Date & Time (Local) *</Label>
+								<div className="flex gap-2">
+									<Input
+										id="checkInDateTime"
+										type="datetime-local"
+										value={formData.checkInDateTime}
+										onChange={(e) => setFormData({ ...formData, checkInDateTime: e.target.value })}
+										className="flex-1"
+										required
+									/>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={() => setFormData({ ...formData, checkInDateTime: getCurrentLocalDateTime() })}
+										className="px-3 whitespace-nowrap"
+									>
+										Now
+									</Button>
+								</div>
+								<p className="text-xs text-muted-foreground mt-1">
+									Enter the time in your local timezone. It will be automatically converted to UTC for storage.
+								</p>
+							</div>
+						</div>
+
+						<div>
+							<Label htmlFor="purpose">Purpose of Visit *</Label>
+							<Input
+								id="purpose"
+								placeholder="e.g., Meeting, Delivery, Maintenance, etc."
+								value={formData.purpose}
+								onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+								required
+							/>
+						</div>
+					</form>
+				</ModalContent>
+
+				<ModalFooter>
+					<Button 
+						type="button" 
+						variant="outline"
+						onClick={() => setIsAddingVisitor(false)}
+					>
+						Cancel
+					</Button>
+					<Button 
+						type="submit" 
+						form="visitor-form"
+						disabled={createVisitorMutation.isPending}
+					>
+						{createVisitorMutation.isPending ? (
+							<div className="flex items-center space-x-2">
+								<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+								<span>Adding...</span>
+							</div>
+						) : (
+							'Add Visitor'
+						)}
+					</Button>
+				</ModalFooter>
+			</Modal>
 		</AuthenticatedLayout>
 	)
 }

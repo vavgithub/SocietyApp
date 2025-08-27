@@ -76,14 +76,13 @@ export function Visitors() {
 								<Button
 									variant={statusFilter === 'checked-in' ? 'default' : 'outline'}
 									onClick={() => setStatusFilter('checked-in')}
-									className="bg-[rgb(22,163,74)] hover:bg-[rgb(21,128,61)]"
 								>
 									Active
 								</Button>
 								<Button
 									variant={statusFilter === 'checked-out' ? 'default' : 'outline'}
 									onClick={() => setStatusFilter('checked-out')}
-									className="bg-[rgb(153,27,27)] hover:bg-[rgb(127,29,29)]"
+									className="bg-destructive hover:bg-destructive/40 text-destructive-foreground"
 								>
 									Checked Out
 								</Button>
@@ -130,8 +129,8 @@ export function Visitors() {
 													</h3>
 													<div className={`px-3 py-1 text-sm rounded-full ${
 														visitor.status === 'checked-in'
-															? 'bg-[rgb(220,252,231)] text-[rgb(22,101,52)]'
-															: 'bg-[rgb(254,226,226)] text-[rgb(153,27,27)]'
+															? 'bg-secondary text-secondary-foreground'
+															: 'bg-destructive text-destructive-foreground'
 													}`}>
 														{visitor.status === 'checked-in' ? 'Currently Inside' : 'Checked Out'}
 													</div>

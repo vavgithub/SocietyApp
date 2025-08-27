@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-	--color-background: 255 255 255;
-	--color-foreground: 15 23 42;
-	--color-card: 255 255 255;
-	--color-card-foreground: 15 23 42;
-	--color-popover: 255 255 255;
-	--color-popover-foreground: 15 23 42;
-	--color-primary: 22 163 74;
-	--color-primary-foreground: 250 250 250;
-	--color-secondary: 240 253 244;
-	--color-secondary-foreground: 22 163 74;
-	--color-muted: 240 253 244;
-	--color-muted-foreground: 100 116 139;
-	--color-accent: 22 163 74;
+	--color-background: 0 0 0;
+	--color-foreground: 250 250 250;
+	--color-card: #171717;
+	--color-card-foreground: 250 250 250;
+	--color-popover: rgb(15 15 15);
+	--color-popover-foreground: 250 250 250;
+	--color-primary: rgb(255, 255, 255);
+	--color-primary-foreground: rgb(0, 0, 0);
+	--color-secondary: rgba(255, 255, 255, 0.08);
+	--color-secondary-foreground: 250 250 250;
+	--color-secondary-hover-bg: rgba(255, 255, 255, 0.1);
+	--color-muted: 25 25 25;
+	--color-muted-foreground: rgb(161, 161, 161);
+	--color-accent: 35 35 35;
 	--color-accent-foreground: 250 250 250;
-	--color-destructive: 239 68 68;
-	--color-destructive-foreground: 250 250 250;
-	--color-border: 220 252 231;
-	--color-input: 220 252 231;
-	--color-ring: 22 163 74;
+	--color-destructive: rgba(255, 255, 255, 0.08);
+	--color-destructive-foreground: rgb(255, 100, 103);
+	--color-border: rgba(255, 255, 255, 0.1);
+	--color-input: 25 25 25;
+	--color-ring: 161 161 170;
 	--color-radius: 0.5rem;
+	--font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 * {
@@ -34,9 +36,7 @@ html {
 body {
 	margin: 0;
 	padding: 0;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-		'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-		sans-serif;
+	font-family: var(--font-family);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	background-color: rgb(var(--color-background));
@@ -75,7 +75,7 @@ body {
 	
 	/* Improve card shadows on mobile */
 	.shadow-medium {
-		box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.1), 0 2px 4px -1px rgba(22, 163, 74, 0.06);
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 	}
 }
 
@@ -88,25 +88,25 @@ body {
 }
 
 .gradient-bg {
-	background: linear-gradient(135deg, rgb(240 253 244) 0%, rgb(220 252 231) 100%);
+	background: linear-gradient(135deg, rgb(var(--color-secondary)) 0%, rgb(var(--color-card)) 100%);
 }
 
 .gradient-bg-dark {
-	background: linear-gradient(135deg, rgb(22 163 74) 0%, rgb(21 128 61) 100%);
+	background: linear-gradient(135deg, rgb(var(--color-card)) 0%, rgb(var(--color-background)) 100%);
 }
 
 .shadow-soft {
-	box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.1), 0 2px 4px -1px rgba(22, 163, 74, 0.06);
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 .shadow-medium {
-	box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.1), 0 4px 6px -2px rgba(22, 163, 74, 0.05);
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
 }
 
 /* Mobile-optimized shadows */
 @media (max-width: 768px) {
 	.shadow-medium {
-		box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.1), 0 2px 4px -1px rgba(22, 163, 74, 0.06);
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 	}
 }
 
@@ -120,8 +120,8 @@ body {
 }
 
 @keyframes pulse-glow {
-	0%, 100% { box-shadow: 0 0 20px rgba(22, 163, 74, 0.3); }
-	50% { box-shadow: 0 0 30px rgba(22, 163, 74, 0.5); }
+	0%, 100% { box-shadow: 0 0 20px rgba(161, 161, 170, 0.3); }
+	50% { box-shadow: 0 0 30px rgba(161, 161, 170, 0.5); }
 }
 
 .animate-pulse-glow {
@@ -176,7 +176,33 @@ textarea {
 button,
 input[type="button"],
 input[type="submit"],
-input[type="reset"],
+input[type="reset"] {
+	cursor: pointer;
+}
+
+/* Dropdown animations */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: scale(0.95) translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+}
+
+.animate-in {
+	animation: fadeIn 0.15s ease-out;
+}
+
+.fade-in-0 {
+	opacity: 0;
+}
+
+.zoom-in-95 {
+	transform: scale(0.95);
+}
 a,
 [role="button"],
 [onclick],

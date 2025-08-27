@@ -3,6 +3,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
+import { Select } from './ui/select'
 import { adminAPI, inviteAPI } from '../lib/api'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { showSuccessToast , showErrorToast } from '../lib/toast'
@@ -96,14 +97,14 @@ export function InviteForm({ role = 'tenant' }) {
 		return (
 			<Card className="shadow-medium">
 				<CardHeader>
-					<CardTitle className="text-[rgb(22,163,74)]">Invite Generated Successfully!</CardTitle>
+					<CardTitle className="text-primary">Invite Generated Successfully!</CardTitle>
 					<CardDescription>
 						The invite link has been generated and copied to your clipboard. Share it with the invited user. The link will expire in 15 minutes.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
-					<div className="p-3 bg-[rgb(240,253,244)] border border-[rgb(187,247,208)] rounded-lg">
-						<p className="text-sm font-medium text-[rgb(22,101,52)]">
+					<div className="p-3 bg-secondary border border-border rounded-lg">
+						<p className="text-sm font-medium text-secondary-foreground">
 							✅ Invite link ready to share
 						</p>
 					</div>
@@ -117,7 +118,7 @@ export function InviteForm({ role = 'tenant' }) {
 						</Button>
 						<Button
 							onClick={() => setShowSuccess(false)}
-							className="flex-1 bg-[rgb(22,163,74)] hover:bg-[rgb(21,128,61)]"
+							className="flex-1"
 						>
 							Generate Another Invite
 						</Button>
@@ -154,21 +155,24 @@ export function InviteForm({ role = 'tenant' }) {
 						<div>
 							<Label>Villa/Flat Assignment</Label>
 							{unitsLoading ? (
-								<div className="mt-2 p-3 bg-[rgb(249,250,251)] border rounded-lg">
+								<div className="mt-2 p-3 bg-muted border rounded-lg">
 									<div className="animate-pulse flex space-x-4">
 										<div className="flex-1 space-y-2 py-1">
-											<div className="h-4 bg-[rgb(229,231,235)] rounded"></div>
-											<div className="h-4 bg-[rgb(229,231,235)] rounded w-5/6"></div>
+											<div className="h-4 bg-border rounded"></div>
+											<div className="h-4 bg-border rounded w-5/6"></div>
 										</div>
 									</div>
 								</div>
 							) : availableUnits?.availableUnits?.length > 0 ? (
 								<div className="mt-2">
-									<select
-										className="w-full p-2 border border-input rounded-md"
+									<Select
+										options={[
+											{ value: "", label: "Select a villa/flat" },
+											...availableUnits.availableUnits
+										]}
 										value={formData.apartmentNumber || formData.flatNumber || ''}
-										onChange={(e) => {
-											const selected = availableUnits.availableUnits.find(unit => unit.value === e.target.value)
+										onChange={(value) => {
+											const selected = availableUnits.availableUnits.find(unit => unit.value === value)
 											if (selected) {
 												setFormData(prev => ({
 													...prev,
@@ -178,20 +182,14 @@ export function InviteForm({ role = 'tenant' }) {
 												}))
 											}
 										}}
-									>
-										<option value="">Select a villa/flat</option>
-										{availableUnits.availableUnits.map((unit) => (
-											<option key={unit.value} value={unit.value}>
-												{unit.label}
-											</option>
-										))}
-									</select>
+										placeholder="Select a villa/flat"
+									/>
 									<p className="text-xs text-muted-foreground mt-1">
 										Choose the villa or flat number for this tenant
 									</p>
 								</div>
 							) : (
-								<div className="mt-2 p-3 bg-[rgb(254,242,242)] border border-[rgb(254,202,202)] rounded-lg">
+								<div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
 									<p className="text-sm text-[rgb(153,27,27)]">
 										No available villas/flats found. Please complete society enrollment first.
 									</p>
@@ -203,7 +201,7 @@ export function InviteForm({ role = 'tenant' }) {
 					<Button
 						type="submit"
 						disabled={generateInviteMutation.isPending || (role === 'tenant' && !formData.apartmentNumber && !formData.flatNumber)}
-						className="w-full bg-[rgb(22,163,74)] hover:bg-[rgb(21,128,61)]"
+						className="w-full"
 					>
 						{generateInviteMutation.isPending ? 'Generating...' : getButtonText()}
 					</Button>

@@ -419,7 +419,6 @@ export function SocietySettings() {
 										<Button
 											type="submit"
 											disabled={updateMutation.isPending}
-											className="bg-[rgb(22,163,74)] hover:bg-[rgb(21,128,61)]"
 										>
 											{updateMutation.isPending ? 'Saving...' : 'Save Changes'}
 										</Button>

@@ -12,7 +12,8 @@ export function TenantDashboard() {
 	const navigate = useNavigate()
 	const [society, setSociety] = useState(null)
 	const [loading, setLoading] = useState(true)
-	const [latestAnnouncement, setLatestAnnouncement] = useState(null)
+	const [upcomingAnnouncements, setUpcomingAnnouncements] = useState([])
+	const [showAllAnnouncements, setShowAllAnnouncements] = useState(false)
 
 	// Fetch my visitors data
 	const { data: myVisitors, isLoading: myVisitorsLoading } = useQuery({
@@ -26,10 +27,14 @@ export function TenantDashboard() {
 			try {
 				const [societyResponse, announcementResponse] = await Promise.all([
 					tenantAPI.getSociety(),
-					announcementAPI.getLatestUpcoming()
+					announcementAPI.getUpcoming()
 				])
 				setSociety(societyResponse.society)
-				setLatestAnnouncement(announcementResponse.announcement)
+				// Sort announcements by due date in ascending order
+				const sortedAnnouncements = announcementResponse.announcements?.sort((a, b) => 
+					new Date(a.dueDate) - new Date(b.dueDate)
+				) || []
+				setUpcomingAnnouncements(sortedAnnouncements)
 			} catch (error) {
 				console.error('Error fetching data:', error)
 			} finally {
@@ -63,41 +68,64 @@ export function TenantDashboard() {
 					</div>
 					{/* Tenant's Apartment Information */}
 					{(user?.apartmentNumber || user?.flatNumber || user?.flatName) && (
-						<div className="p-3 sm:p-4 bg-[rgb(240,249,255)] border border-[rgb(186,230,253)] rounded-lg">
 							<div className="flex items-center space-x-2">
-								<span className="text-[rgb(14,116,144)] font-medium text-sm sm:text-base">🏠 Your Villa/Flat:</span>
-								<span className="text-[rgb(14,116,144)] text-sm sm:text-base">
+								<h2 className="text-primary  font-bold text-xl">Your Villa/Flat : </h2>
+								<h2 className="text-primary text-xl">
 									{user.apartmentNumber || user.flatNumber || user.flatName}
-								</span>
+								</h2>
 							</div>
-						</div>
 					)}
 				</div>
 
-				{/* Announcement Banner */}
-				{latestAnnouncement && (
-					<div className="p-4 sm:p-6 bg-[rgb(254,242,242)] border border-[rgb(254,202,202)] rounded-lg">
-						<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-4 sm:space-y-0">
-							<div className="flex-1 space-y-3">
-								<div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-									<h3 className="font-semibold text-[rgb(153,27,27)] text-base sm:text-lg">📢 {latestAnnouncement.title}</h3>
-									<span className="px-2 py-1 text-xs rounded-full bg-[rgb(254,226,226)] text-[rgb(153,27,27)] self-start sm:self-auto">
-										Due: {formatDate(latestAnnouncement.dueDate)}
-									</span>
-								</div>
-								<p className="text-sm text-[rgb(153,27,27)]">{latestAnnouncement.description}</p>
-								<div className="text-xs text-[rgb(153,27,27)] opacity-75">
-									Posted by: {latestAnnouncement.createdBy?.name || 'Unknown'} • {formatDate(latestAnnouncement.createdAt)}
-								</div>
+				{/* Upcoming Announcements */}
+				{upcomingAnnouncements.length > 0 && (
+					<div className="p-4 sm:p-6 bg-card border border-border rounded-lg">
+						<div className="space-y-4">
+							<div className="flex items-center justify-between">
+								<h3 className="font-semibold text-foreground text-lg">📢 Upcoming Announcements</h3>
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => navigate('/tenant/announcements')}
+									className="text-foreground border-border hover:bg-accent"
+								>
+									View All
+								</Button>
 							</div>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => navigate('/tenant/announcements')}
-								className="text-[rgb(153,27,27)] border-[rgb(254,202,202)] hover:bg-[rgb(254,226,226)] self-start sm:self-auto"
-							>
-								View More
-							</Button>
+							
+							<div className="space-y-3">
+								{upcomingAnnouncements.slice(0, showAllAnnouncements ? upcomingAnnouncements.length : 2).map((announcement, index) => (
+									<div key={announcement._id} className="p-3 bg-background border border-border rounded-md">
+										<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-2 sm:space-y-0">
+											<div className="flex-1 space-y-2">
+												<div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3">
+													<h4 className="font-medium text-destructive-foreground text-sm sm:text-base">{announcement.title}</h4>
+													<span className="px-2 py-1 text-xs rounded-full bg-destructive text-destructive-foreground self-start sm:self-auto">
+														Due: {formatDate(announcement.dueDate)}
+													</span>
+												</div>
+												<p className="text-sm text-muted-foreground">{announcement.description}</p>
+												<div className="text-xs text-muted-foreground">
+													Posted by: {announcement.createdBy?.name || 'Unknown'} • {formatDate(announcement.createdAt)}
+												</div>
+											</div>
+										</div>
+									</div>
+								))}
+							</div>
+							
+							{upcomingAnnouncements.length > 2 && (
+								<div className="flex justify-center">
+									<Button
+										variant="ghost"
+										size="sm"
+										onClick={() => setShowAllAnnouncements(!showAllAnnouncements)}
+										className="text-muted-foreground hover:text-foreground"
+									>
+										{showAllAnnouncements ? 'Show Less' : `Show ${upcomingAnnouncements.length - 2} More`}
+									</Button>
+								</div>
+							)}
 						</div>
 					</div>
 				)}

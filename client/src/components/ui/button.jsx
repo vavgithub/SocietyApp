@@ -9,10 +9,10 @@ const buttonVariants = cva(
 				default:
 					'bg-primary text-primary-foreground shadow hover:opacity-90',
 				cta:
-					'bg-[rgb(22,163,74)] text-white shadow hover:bg-[rgb(21,128,61)] hover:opacity-90',
+					'bg-primary text-primary-foreground shadow hover:opacity-90',
 				secondary:
 					'bg-secondary text-secondary-foreground hover:opacity-90',
-				outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+				outline: 'border border-input bg-secondary hover:bg-accent hover:bg-secondary-hover-bg',
 				ghost: 'hover:bg-accent hover:text-accent-foreground',
 				link: 'text-primary underline-offset-4 hover:underline',
 			},

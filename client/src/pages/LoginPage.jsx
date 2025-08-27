@@ -136,7 +136,7 @@ export function LoginPage() {
 							<Button 
 								type="submit" 
 								variant="cta" 
-								className="w-full h-11 sm:h-12 text-base font-medium" 
+								className="w-full h-11  text-base font-medium" 
 								disabled={isLoggingIn}
 							>
 								{isLoggingIn ? (

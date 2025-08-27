@@ -175,52 +175,63 @@ export function Sidebar({ onMobileClose }) {
 	const navItems = getNavItems()
 
 	return (
-		<div className={`bg-[rgb(30,59,39)] text-white h-screen flex flex-col transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
+		<div className={`bg-card text-card-foreground h-[calc(100vh-2rem)] rounded-xl ml-4 my-4 flex flex-col transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
 			{/* Header */}
-			<div className="p-4 border-b border-[rgb(51,65,85)]">
+			<div className="p-4 border-b border-border">
 				<div className="flex items-center justify-between">
 					{!isCollapsed && (
 						<div className="flex items-center gap-2">
-							<div className="h-8 w-8 relative">
-								<svg viewBox="0 0 24 24" fill="none" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-									<rect x="3" y="8" width="18" height="13" rx="1" fill="#ffffff" className="drop-shadow-sm" />
-									<rect x="5" y="10" width="3" height="3" fill="#1e293b" />
-									<rect x="10" y="10" width="3" height="3" fill="#1e293b" />
-									<rect x="15" y="10" width="3" height="3" fill="#1e293b" />
-									<rect x="5" y="15" width="3" height="3" fill="#1e293b" />
-									<rect x="10" y="15" width="3" height="3" fill="#1e293b" />
-									<rect x="15" y="15" width="3" height="3" fill="#1e293b" />
-									<path d="M2 8L12 2L22 8" stroke="#ffffff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-									<path d="M6 4L8 2M8 2L10 4M8 2V6" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-									<path d="M18 4L16 2M16 2L14 4M16 2V6" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-								</svg>
+							<div className="h-8 w-8 relative invert">
+							<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+								width="32" height="28" viewBox="0 0 300.000000 260.000000"
+								preserveAspectRatio="xMidYMid meet">
+								<metadata>
+								Created by potrace 1.10, written by Peter Selinger 2001-2011
+								</metadata>
+								<g transform="translate(0.000000,260.000000) scale(0.100000,-0.100000)"
+								fill="#000000" stroke="none">
+								<path d="M1615 2337 c-154 -89 -347 -200 -428 -246 l-147 -85 -2 -240 -3 -241
+								-112 -50 -113 -50 0 -602 0 -603 -22 -4 c-13 -3 -142 -21 -288 -41 -145 -20
+								-267 -38 -269 -41 -2 -2 147 -4 332 -4 l337 0 0 620 0 620 66 30 c37 16 68 30
+								70 30 2 0 4 -295 4 -655 l0 -655 195 0 195 0 0 790 c0 435 -2 790 -4 790 -2 0
+								-68 -29 -146 -65 -78 -36 -144 -65 -146 -65 -2 0 -4 87 -4 193 l0 194 340 196
+								c187 108 343 197 345 197 3 0 4 -104 3 -232 l-3 -232 -142 -66 c-124 -57 -142
+								-68 -145 -91 -2 -15 -4 -381 -4 -815 l1 -789 193 -3 192 -2 0 857 0 858 158
+								73 c86 40 160 72 165 72 4 0 7 -421 7 -935 l0 -935 287 0 c157 0 284 2 282 4
+								-2 2 -103 20 -224 40 -121 20 -230 39 -242 41 l-23 5 -2 959 -3 959 -200 -93
+								-200 -93 -3 284 c-1 156 -6 284 -10 284 -4 0 -133 -73 -287 -163z m205 -919
+								c1 -205 1 -425 1 -488 0 -63 0 -251 0 -417 l-1 -303 -105 0 -105 0 0 743 0
+								743 98 46 c53 25 100 47 105 47 4 1 7 -167 7 -371z m-480 -538 l0 -680 -105 0
+								-105 0 0 636 0 635 93 44 c50 24 98 44 105 44 9 1 12 -141 12 -679z"/>
+								</g>
+							</svg>
 							</div>
 							<div className="flex flex-col">
 								<span className="font-bold text-lg leading-tight">SocietySync</span>
-								<span className="text-xs text-[rgb(203,213,225)] leading-tight">Smart Community</span>
+								<span className="text-xs text-muted-foreground leading-tight">Smart Community</span>
 							</div>
 						</div>
 					)}
 					{/* Only show collapse button on desktop */}
-					<div className="hidden lg:block">
+					{/* <div className="hidden lg:block">
 						<Button
 							variant="ghost"
 							size="sm"
 							onClick={() => setIsCollapsed(!isCollapsed)}
-							className="text-[rgb(203,213,225)] hover:text-white hover:bg-[rgb(51,65,85)]"
+							className="text-muted-foreground hover:text-foreground hover:bg-accent"
 						>
 							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
 							</svg>
 						</Button>
-					</div>
+					</div> */}
 					{/* Mobile close button */}
 					<div className="lg:hidden">
 						<Button
 							variant="ghost"
 							size="sm"
 							onClick={onMobileClose}
-							className="text-[rgb(203,213,225)] hover:text-white hover:bg-[rgb(51,65,85)]"
+							className="text-muted-foreground hover:text-foreground hover:bg-accent"
 						>
 							<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -241,8 +252,8 @@ export function Sidebar({ onMobileClose }) {
 							onClick={() => handleNavigation(item.path)}
 							className={`w-full justify-start gap-3 h-12 ${
 								isActive
-									? 'bg-[rgb(37,99,235)] text-white hover:bg-[rgb(29,78,216)]'
-									: 'text-[rgb(203,213,225)] hover:text-white hover:bg-[rgb(51,65,85)]'
+									? 'bg-primary text-primary-foreground hover:opacity-90'
+									: 'text-muted-foreground hover:text-foreground hover:bg-accent'
 							}`}
 						>
 							{item.icon}
@@ -253,12 +264,12 @@ export function Sidebar({ onMobileClose }) {
 			</nav>
 
 			{/* User Profile & Logout */}
-			<div className="p-4 border-t border-[rgb(51,65,85)] space-y-2">
+			<div className="p-4 border-t border-border space-y-2">
 				{/* Profile */}
 				<Button
 					variant="ghost"
 					onClick={() => handleNavigation(`/${user?.role}/profile`)}
-					className="w-full justify-start gap-3 h-12 text-[rgb(203,213,225)] hover:text-white hover:bg-[rgb(51,65,85)]"
+					className="w-full justify-start gap-3 h-12 text-muted-foreground hover:text-foreground hover:bg-accent"
 				>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -270,7 +281,7 @@ export function Sidebar({ onMobileClose }) {
 				<Button
 					variant="ghost"
 					onClick={handleLogout}
-					className="w-full justify-start gap-3 h-12 text-[rgb(248,113,113)] hover:text-[rgb(252,165,165)] hover:bg-[rgb(127,29,29)]/20"
+					className="w-full justify-start gap-3 h-12 text-destructive-foreground hover:text-destructive-foreground/70 hover:bg-destructive/10"
 				>
 					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -280,9 +291,9 @@ export function Sidebar({ onMobileClose }) {
 
 				{/* User Info */}
 				{!isCollapsed && (
-					<div className="pt-2 border-t border-[rgb(51,65,85)]">
-						<div className="text-sm text-[rgb(148,163,184)]">
-							<div className="font-medium text-[rgb(226,232,240)]">{user?.name}</div>
+					<div className="pt-2 border-t border-border">
+						<div className="text-sm text-muted-foreground">
+							<div className="font-medium text-foreground">{user?.name}</div>
 							<div className="text-xs capitalize">{user?.role}</div>
 						</div>
 					</div>

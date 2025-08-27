@@ -82,7 +82,6 @@ export function Profile() {
 									<Button
 										onClick={handleEdit}
 										variant="outline"
-										className="bg-[rgb(59,130,246)] text-white hover:bg-[rgb(37,99,235)] border-[rgb(59,130,246)]"
 									>
 										Edit Profile
 									</Button>
@@ -122,7 +121,7 @@ export function Profile() {
 											type="email"
 											value={user?.email || ''}
 											disabled
-											className="bg-[rgb(249,250,251)] cursor-not-allowed"
+											className="bg-muted cursor-not-allowed"
 										/>
 										<p className="text-sm text-muted-foreground mt-1">
 											Email address cannot be changed for security reasons.
@@ -132,7 +131,7 @@ export function Profile() {
 									{/* Role Information (Read-only) */}
 									<div>
 										<Label>Role</Label>
-										<div className="mt-1 p-3 bg-[rgb(249,250,251)] border rounded-md">
+										<div className="mt-1 p-3 h-11 border rounded-md">
 											<span className="capitalize font-medium text-foreground">
 												{user?.role || 'Unknown'}
 											</span>
@@ -143,7 +142,7 @@ export function Profile() {
 									{user?.role === 'tenant' && (user?.apartmentNumber || user?.flatNumber || user?.flatName) && (
 										<div>
 											<Label>Assigned Unit</Label>
-											<div className="mt-1 p-3 bg-[rgb(249,250,251)] border rounded-md">
+											<div className="mt-1 h-11 p-3 bg-muted border rounded-md">
 												<span className="font-medium text-foreground">
 													{user.apartmentNumber || user.flatNumber || user.flatName}
 												</span>
@@ -156,7 +155,6 @@ export function Profile() {
 										<Button
 											type="submit"
 											disabled={updateProfileMutation.isPending}
-											className="bg-[rgb(22,163,74)] hover:bg-[rgb(21,128,61)]"
 										>
 											{updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
 										</Button>

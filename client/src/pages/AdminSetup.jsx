@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { Select } from '../components/ui/select'
 import { Navbar } from '../components/Navbar'
 import { Navigate } from 'react-router-dom'
 import { authAPI } from '../lib/api'
@@ -256,20 +257,23 @@ export function AdminSetup() {
 
 											<div className="space-y-2">
 												<Label htmlFor="housingType" className="text-sm sm:text-base">Housing Type</Label>
-												<select
+												<Select
 													id="housingType"
-													name="housingType"
+													options={[
+														{ value: "villa", label: "Villa" },
+														{ value: "flat", label: "Flat" }
+													]}
 													value={formData.housingType}
-													onChange={handleChange}
-													className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
-														errors.housingType ? 'border-[rgb(239,68,68)]' : 'border-gray-300'
-													}`}
-												>
-																									<option value="villa">Villa</option>
-												<option value="flat">Flat</option>
-												</select>
+													onChange={(value) => {
+														setFormData(prev => ({ ...prev, housingType: value }))
+														if (errors.housingType) {
+															setErrors(prev => ({ ...prev, housingType: '' }))
+														}
+													}}
+													placeholder="Select housing type"
+												/>
 												{errors.housingType && (
-													<p className="text-sm text-[rgb(239,68,68)]">{errors.housingType}</p>
+													<p className="text-sm text-destructive">{errors.housingType}</p>
 												)}
 											</div>
 										</div>

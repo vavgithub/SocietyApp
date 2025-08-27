@@ -206,7 +206,7 @@ export function Facilities() {
 															<h3 className="font-semibold text-foreground">{facility.name}</h3>
 															<span className={`px-2 py-1 text-xs rounded-full ${
 																facility.isActive 
-																	? 'bg-[rgb(220,252,231)] text-[rgb(22,101,52)]' 
+																	? 'bg-secondary text-secondary-foreground' 
 																	: 'bg-[rgb(254,226,226)] text-[rgb(153,27,27)]'
 															}`}>
 																{facility.isActive ? 'Active' : 'Inactive'}

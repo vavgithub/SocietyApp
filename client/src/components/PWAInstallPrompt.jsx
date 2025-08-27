@@ -59,24 +59,24 @@ export function PWAInstallPrompt() {
   if (!showInstallPrompt) return null
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+    <div className="fixed bottom-4 left-4 right-4 z-50 bg-card border border-border rounded-lg shadow-lg p-4">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-gray-900">Install SocietySync</h3>
-          <p className="text-xs text-gray-600 mt-1">
+          <h3 className="text-sm font-semibold text-foreground">Install SocietySync</h3>
+          <p className="text-xs text-muted-foreground mt-1">
             Install our app for a better experience. Get quick access and work offline.
           </p>
         </div>
         <div className="flex items-center gap-2 ml-4">
           <button
             onClick={handleInstallClick}
-            className="px-4 py-2 bg-[rgb(22,163,74)] text-white text-sm font-medium rounded-md hover:bg-[rgb(21,128,61)] transition-colors"
+            className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:opacity-90 transition-colors"
           >
             Install
           </button>
           <button
             onClick={handleDismiss}
-            className="px-3 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
+            className="px-3 py-2 bg-secondary text-secondary-foreground text-sm font-medium rounded-md hover:opacity-90 transition-colors"
           >
             Not now
           </button>

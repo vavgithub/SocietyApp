@@ -68,7 +68,7 @@ function Home() {
 
 	// Show landing page for unauthenticated users
 	return (
-			<div className="min-h-screen gradient-bg">
+			<div className="min-h-screen bg-background">
 				{/* Navigation */}
 				<Navbar />
 
@@ -121,7 +121,7 @@ function Home() {
 				</section>
 
 				{/* Features Section */}
-				<section className="py-20 bg-white">
+				<section className="py-20 bg-foreground">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 						<div className="text-center mb-16">
 							<h2 className="text-4xl font-bold text-foreground mb-4">
@@ -218,7 +218,7 @@ function Home() {
 				</section>
 
 				{/* Footer */}
-				<footer className="bg-white border-t border-primary/10 py-12">
+				<footer className="bg-primary-foreground border-t border-primary/10 py-12">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 						<div className="grid md:grid-cols-4 gap-8">
 							<div className="md:col-span-2">

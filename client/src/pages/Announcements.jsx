@@ -6,6 +6,7 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { Modal, ModalHeader, ModalContent, ModalFooter } from '../components/ui/modal'
 import { AuthenticatedLayout } from '../components/AuthenticatedLayout'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 
@@ -208,7 +209,7 @@ export function Announcements() {
 					</p>
 				</div>
 
-				<div className="grid lg:grid-cols-3 gap-8">
+				<div className="flex flex-col gap-8">
 					{/* Announcements List */}
 					<div className="lg:col-span-2">
 						<Card className="shadow-medium">
@@ -252,7 +253,7 @@ export function Announcements() {
 															<div className={`px-2 py-1 text-xs rounded-full ${
 																isPastDue(announcement.dueDate)
 																	? 'bg-[rgb(254,226,226)] text-[rgb(153,27,27)]'
-																	: 'bg-[rgb(220,252,231)] text-[rgb(22,101,52)]'
+																	: 'bg-secondary text-secondary-foreground'
 															}`}>
 																{isPastDue(announcement.dueDate) ? 'Past Due' : 'Active'}
 															</div>
@@ -305,105 +306,110 @@ export function Announcements() {
 						</Card>
 					</div>
 
-					{/* Add/Edit Announcement Form */}
-					{isAddingAnnouncement && canManageAnnouncements && (
-						<div className="lg:col-span-1">
-							<Card className="shadow-medium">
-								<CardHeader>
-									<CardTitle>
-										{editingAnnouncement ? 'Edit Announcement' : 'New Announcement'}
-									</CardTitle>
-									<CardDescription>
-										{editingAnnouncement ? 'Update announcement information' : 'Create a new announcement for your society'}
-									</CardDescription>
-								</CardHeader>
-								<CardContent>
-									<form onSubmit={handleSubmit} className="space-y-4">
-										<div className="space-y-2">
-											<Label htmlFor="title">Title *</Label>
-											<Input
-												id="title"
-												name="title"
-												placeholder="Enter announcement title"
-												value={formData.title}
-												onChange={handleChange}
-												className={errors.title ? 'border-[rgb(239,68,68)]' : ''}
-											/>
-											{errors.title && (
-												<p className="text-sm text-[rgb(239,68,68)]">{errors.title}</p>
-											)}
-										</div>
 
-										<div className="space-y-2">
-											<Label htmlFor="description">Description *</Label>
-											<textarea
-												id="description"
-												name="description"
-												rows="4"
-												placeholder="Enter announcement details..."
-												value={formData.description}
-												onChange={handleChange}
-												className={`w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary resize-none ${
-													errors.description ? 'border-[rgb(239,68,68)]' : ''
-												}`}
-											/>
-											{errors.description && (
-												<p className="text-sm text-[rgb(239,68,68)]">{errors.description}</p>
-											)}
-										</div>
-
-										<div className="space-y-2">
-											<Label htmlFor="dueDate">Due Date *</Label>
-											<Input
-												id="dueDate"
-												name="dueDate"
-												type="datetime-local"
-												value={formData.dueDate}
-												onChange={handleChange}
-												className={errors.dueDate ? 'border-[rgb(239,68,68)]' : ''}
-											/>
-											{errors.dueDate && (
-												<p className="text-sm text-[rgb(239,68,68)]">{errors.dueDate}</p>
-											)}
-										</div>
-
-										{errors.submit && (
-											<div className="p-3 bg-[rgb(254,242,242)] border border-[rgb(254,202,202)] rounded-md">
-												<p className="text-sm text-[rgb(239,68,68)]">{errors.submit}</p>
-											</div>
-										)}
-
-										<div className="flex space-x-2">
-											<Button 
-												type="submit" 
-												variant="cta" 
-												className="flex-1"
-												disabled={createAnnouncementMutation.isPending || updateAnnouncementMutation.isPending}
-											>
-												{createAnnouncementMutation.isPending || updateAnnouncementMutation.isPending ? (
-													<div className="flex items-center space-x-2">
-														<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-														<span>Saving...</span>
-													</div>
-												) : (
-													editingAnnouncement ? 'Update Announcement' : 'Create Announcement'
-												)}
-											</Button>
-											<Button 
-												type="button" 
-												variant="outline"
-												onClick={handleCancel}
-											>
-												Cancel
-											</Button>
-										</div>
-									</form>
-								</CardContent>
-							</Card>
-						</div>
-					)}
 				</div>
 			</div>
+
+			{/* Add/Edit Announcement Modal */}
+			<Modal 
+				isOpen={isAddingAnnouncement && canManageAnnouncements} 
+				onClose={handleCancel}
+				className="max-w-lg"
+			>
+				<ModalHeader>
+					<div>
+						<h2 className="text-lg font-semibold text-foreground">
+							{editingAnnouncement ? 'Edit Announcement' : 'New Announcement'}
+						</h2>
+						<p className="text-sm text-muted-foreground">
+							{editingAnnouncement ? 'Update announcement information' : 'Create a new announcement for your society'}
+						</p>
+					</div>
+				</ModalHeader>
+				
+				<ModalContent>
+					<form id="announcement-form" onSubmit={handleSubmit} className="space-y-4">
+						<div className="space-y-2">
+							<Label htmlFor="title">Title *</Label>
+							<Input
+								id="title"
+								name="title"
+								placeholder="Enter announcement title"
+								value={formData.title}
+								onChange={handleChange}
+								className={errors.title ? 'border-destructive' : ''}
+							/>
+							{errors.title && (
+								<p className="text-sm text-destructive">{errors.title}</p>
+							)}
+						</div>
+
+						<div className="space-y-2">
+							<Label htmlFor="description">Description *</Label>
+							<textarea
+								id="description"
+								name="description"
+								rows="4"
+								placeholder="Enter announcement details..."
+								value={formData.description}
+								onChange={handleChange}
+								className={`w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-ring resize-none bg-background text-foreground ${
+									errors.description ? 'border-destructive' : ''
+								}`}
+							/>
+							{errors.description && (
+								<p className="text-sm text-destructive">{errors.description}</p>
+							)}
+						</div>
+
+						<div className="space-y-2">
+							<Label htmlFor="dueDate">Due Date *</Label>
+							<Input
+								id="dueDate"
+								name="dueDate"
+								type="datetime-local"
+								value={formData.dueDate}
+								onChange={handleChange}
+								className={errors.dueDate ? 'border-destructive' : ''}
+							/>
+							{errors.dueDate && (
+								<p className="text-sm text-destructive">{errors.dueDate}</p>
+							)}
+						</div>
+
+						{errors.submit && (
+							<div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+								<p className="text-sm text-destructive">{errors.submit}</p>
+							</div>
+						)}
+					</form>
+				</ModalContent>
+
+				<ModalFooter>
+					<Button 
+						type="button" 
+						variant="outline"
+						onClick={handleCancel}
+					>
+						Cancel
+					</Button>
+					<Button 
+						type="submit" 
+						form="announcement-form"
+						variant="default"
+						disabled={createAnnouncementMutation.isPending || updateAnnouncementMutation.isPending}
+					>
+						{createAnnouncementMutation.isPending || updateAnnouncementMutation.isPending ? (
+							<div className="flex items-center space-x-2">
+								<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+								<span>Saving...</span>
+							</div>
+						) : (
+							editingAnnouncement ? 'Update Announcement' : 'Create Announcement'
+						)}
+					</Button>
+				</ModalFooter>
+			</Modal>
 		</AuthenticatedLayout>
 	)
 }

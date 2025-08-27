@@ -5,7 +5,7 @@ export function AuthenticatedLayout({ children }) {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
 	return (
-		<div className="flex h-screen bg-[rgb(249,250,251)]">
+		<div className="flex h-screen bg-background">
 			{/* Mobile menu overlay */}
 			{isMobileMenuOpen && (
 				<div 
@@ -29,10 +29,10 @@ export function AuthenticatedLayout({ children }) {
 			{/* Main content */}
 			<main className="flex-1 overflow-auto">
 				{/* Mobile header */}
-				<div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+				<div className="lg:hidden bg-card border-b border-border px-4 py-3 flex items-center justify-between">
 					<button
 						onClick={() => setIsMobileMenuOpen(true)}
-						className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+						className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
 					>
 						<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -53,7 +53,7 @@ export function AuthenticatedLayout({ children }) {
 								<path d="M18 4L16 2M16 2L14 4M16 2V6" stroke="#1e3a2e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 							</svg>
 						</div>
-						<span className="font-bold text-lg text-gray-900">SocietySync</span>
+						<span className="font-bold text-lg text-foreground">SocietySync</span>
 					</div>
 					<div className="w-10" /> {/* Spacer for centering */}
 				</div>

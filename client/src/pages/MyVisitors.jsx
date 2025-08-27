@@ -75,7 +75,7 @@ export function MyVisitors() {
 													</h3>
 													<div className={`px-3 py-1 text-sm rounded-full ${
 														visitor.status === 'checked-in'
-															? 'bg-[rgb(220,252,231)] text-[rgb(22,101,52)]'
+															? 'bg-secondary text-secondary-foreground'
 															: 'bg-[rgb(254,226,226)] text-[rgb(153,27,27)]'
 													}`}>
 														{visitor.status === 'checked-in' ? 'Currently Inside' : 'Checked Out'}

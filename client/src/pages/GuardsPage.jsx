@@ -89,7 +89,7 @@ export function GuardsPage() {
 												<td className="py-3 px-4">
 																					<span className={`px-2 py-1 rounded-full text-xs font-medium ${
 									guard.isActive 
-										? 'bg-[rgb(220,252,231)] text-[rgb(22,101,52)]'
+										? 'bg-secondary text-secondary-foreground'
 										: 'bg-[rgb(254,226,226)] text-[rgb(153,27,27)]'
 								}`}>
 									{guard.isActive ? 'Active' : 'Inactive'}
